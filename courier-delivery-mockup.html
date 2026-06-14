@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мокап: адресна доставка по Києву (демо-дані)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.17.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --color-background-primary:#ffffff; --color-background-secondary:#f6f5f1; --color-background-tertiary:#eeede8;
+  --color-background-info:#E6F1FB;
+  --color-text-primary:#1d1c1a; --color-text-secondary:#5f5e5a; --color-text-tertiary:#8a8980; --color-text-info:#0C447C;
+  --color-border-tertiary:rgba(0,0,0,.12); --color-border-secondary:rgba(0,0,0,.24);
+  --border-radius-md:8px; --border-radius-lg:12px;
+  --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; --font-mono:ui-monospace,SFMono-Regular,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --color-background-primary:#1a1f2b; --color-background-secondary:#141822; --color-background-tertiary:#222a38;
+    --color-background-info:#16263a;
+    --color-text-primary:#eef2f8; --color-text-secondary:#a8b2c4; --color-text-tertiary:#727e95; --color-text-info:#85B7EB;
+    --color-border-tertiary:rgba(255,255,255,.14); --color-border-secondary:rgba(255,255,255,.26);
+  }
+  body{background:#0f131b}
+}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 0;background:#e7eaee;font-family:var(--font-sans);color:var(--color-text-primary);-webkit-text-size-adjust:100%}
+button{font-family:inherit}
+input{accent-color:#534AB7}
+a{text-decoration:none}
+.cd{font-family:var(--font-sans);background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:12px;max-width:380px;margin:0 auto}
+.cd-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.cd-tab{font-size:11.5px;padding:4px 9px;border-radius:999px;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);display:inline-flex;align-items:center;gap:4px}
+.cd-tab.on{background:#534AB7;color:#fff;border-color:transparent}
+.cd-map{position:relative;height:208px;border-radius:var(--border-radius-md);background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);overflow:hidden}
+.riv{position:absolute;top:-20%;left:58%;width:46px;height:150%;background:#85B7EB;opacity:.30;transform:rotate(15deg);border-radius:40px}
+.dlbl{position:absolute;font-size:10px;color:var(--color-text-tertiary);transform:translate(-50%,-50%)}
+.pin{position:absolute;width:24px;height:24px;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;border:2px solid var(--color-background-primary)}
+.pin.sel{box-shadow:0 0 0 3px var(--color-text-primary)}
+.pin .ti{font-size:13px}
+.row{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 10px;margin-top:7px;cursor:pointer}
+.row.sel{border-color:#534AB7;border-width:1.5px}
+.bdg{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.mut{color:var(--color-text-tertiary);font-size:11.5px}
+.btn{border:.5px solid var(--color-border-secondary);background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:7px 11px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:var(--color-text-primary)}
+.btn.pri{background:#534AB7;color:#fff;border-color:transparent}
+.btn:disabled{opacity:.45;cursor:default}
+.phone{display:inline-flex;align-items:center;gap:6px}
+.ico{width:26px;height:26px;border-radius:7px;border:.5px solid var(--color-border-secondary);display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:var(--color-text-primary)}
+.note{background:var(--color-background-info);border-radius:var(--border-radius-md);padding:9px 11px;font-size:12px;color:var(--color-text-info);line-height:1.5;display:flex;gap:7px}
+.stop{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 10px;margin-top:7px}
+.num{width:22px;height:22px;border-radius:50%;background:#534AB7;color:#fff;font-size:11.5px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.pbtn{padding:3px 9px;border-radius:999px;font-size:11.5px;border:.5px solid var(--color-border-secondary);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-primary)}
+.pbtn.on{background:#534AB7;color:#fff;border-color:transparent}
+.tip{max-width:380px;margin:10px auto 0;font-size:12px;color:#566;text-align:center}
+</style>
+</head>
+<body>
+<div class="cd">
+  <div class="cd-tabs">
+    <span class="cd-tab"><i class="ti ti-building-warehouse"></i>Цех</span>
+    <span class="cd-tab"><i class="ti ti-truck"></i>Їде</span>
+    <span class="cd-tab"><i class="ti ti-package"></i>Доставлено</span>
+    <span class="cd-tab"><i class="ti ti-chart-bar"></i>Звіти</span>
+    <span class="cd-tab on"><i class="ti ti-map-2"></i>Доставка</span>
+  </div>
+  <div class="cd-map" id="map"></div>
+  <div id="bar" style="display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap"></div>
+  <div id="list" style="margin-top:4px"></div>
+  <div id="route" style="margin-top:4px;display:none"></div>
+</div>
+<div class="tip">Демо-дані (вигадані). Тапни пін або рядок → «Оптимізувати» → пройди статуси/оплату.</div>
+<script>
+(function(){
+  var D=[
+    {id:'d01',name:'Тарас',phone:'+380500000001',dist:'Оболонь',col:'#1D9E75',clean:'вул. Приозерна, 12, 1 під.',raw:'ДН(курʼєр) Приозерна 12,1під Тарас 0500000001',code:'ДН',com:'',ready:'13.06 10:20',odate:'10.06',geo:'ok',top:17,left:46,payer:'client',fee:null,montage:false,sel:false,st:'pending'},
+    {id:'d02',name:'Оксана',phone:'+380500000002',dist:'Поділ',col:'#D4537E',clean:'вул. Контрактова, 4',raw:'ДН(курʼєр) Контрактова буд 4 Оксана 0500000002',code:'ДН',com:'',ready:'13.06 11:40',odate:'07.06',geo:'ok',top:33,left:50,payer:'client',fee:null,montage:false,sel:false,st:'pending'},
+    {id:'d03',name:'Богдан',phone:'+380500000003',dist:'Печерськ',col:'#7F77DD',clean:'вул. Лісова, 14, 3 під.',raw:'ДН(курʼєр) Лісова 14, 3п Богдан 0500000003',code:'ДН',com:'демо коментар',ready:'13.06 16:54',odate:'09.06',geo:'ok',top:56,left:54,payer:'client',fee:null,montage:false,sel:false,st:'pending'},
+    {id:'d04',name:'Ніна',phone:'+380500000004',dist:'Лівобережжя',col:'#BA7517',clean:'вул. Набережна, 11/1',raw:'ДН(курʼєр): Набережна 11/1 Ніна 0500000004',code:'ДН',com:'',ready:'12.06 17:02',odate:'09.06',geo:'ok',top:50,left:76,payer:'client',fee:null,montage:false,sel:false,st:'pending'},
+    {id:'d05',name:'Степан',phone:'+380500000005',dist:"Солом'янка",col:'#378ADD',clean:'вул. Квіткова, 18, кв 16',raw:'ДМО(курʼєр,400) Квіткова 18, кв 16 Степан 0500000005',code:'ДМО',com:'монтаж — взяти інструмент',ready:'12.06 18:33',odate:'04.06',geo:'ok',top:60,left:38,payer:'us',fee:400,montage:true,sel:false,st:'pending'},
+    {id:'d06',name:'Лідія',phone:'+380500000006',dist:"Солом'янка",col:'#378ADD',clean:'вул. Садова, 3, кв 33',raw:'ДМН: Лідія, (демо) Садова 3 кв 33 0500000006',code:'ДМН',com:'демо-пожелання; до 18:00',ready:'13.06 12:07',odate:'06.06',geo:'ok',top:65,left:33,payer:'client',fee:null,montage:true,win:true,sel:false,st:'pending'},
+    {id:'d07',name:'Юрій',phone:'+380500000007',dist:'приміська',col:'#E24B4A',clean:'смт Демидів (за межами Києва)',raw:'ДМО(курʼєр 1200) Демидів 0500000007 Юрій',code:'ДМО',com:'',ready:'11.06 11:18',odate:'03.06',geo:'outkyiv',top:9,left:18,payer:'us',fee:1200,montage:true,sel:false,st:'pending'},
+    {id:'d08',name:'—',phone:null,dist:'Невідомо',col:'#888780',clean:null,raw:'- курʼєр уточнить, можливо точка (демо незрозуміла адреса)',code:'—',com:'адреса незрозуміла',ready:'13.06 09:00',odate:'08.06',geo:'pin',top:null,left:null,payer:'client',fee:null,montage:false,sel:false,st:'pending'},
+  ];
+  var order=['Оболонь','Поділ',"Солом'янка",'Печерськ','Лівобережжя','приміська','Невідомо'];
+  var $=function(id){return document.getElementById(id);};
+  function selOrders(){return D.filter(function(o){return o.sel;});}
+  function esc(s){return (s||'').replace(/</g,'&lt;');}
+  function renderMap(){
+    var labels=[['Оболонь',46,9],['Поділ',58,26],["Солом'янка",30,72],['Печерськ',56,68],['Лівобережжя',80,40]];
+    var h='<div class="riv"></div>';
+    labels.forEach(function(l){h+='<div class="dlbl" style="left:'+l[1]+'%;top:'+l[2]+'%">'+l[0]+'</div>';});
+    h+='<div class="pin" title="Депо: Здолбунівська 7Д" style="left:12%;top:46%;background:#2C2C2A"><i class="ti ti-home"></i></div>';
+    D.forEach(function(o){
+      if(o.top===null) return;
+      var ic=o.geo==='outkyiv'?'ti-alert-triangle':'ti-map-pin';
+      h+='<div class="pin'+(o.sel?' sel':'')+'" data-id="'+o.id+'" style="left:'+o.left+'%;top:'+o.top+'%;background:'+o.col+'"><i class="ti '+ic+'"></i></div>';
+    });
+    $('map').innerHTML=h;
+    [].forEach.call($('map').querySelectorAll('.pin[data-id]'),function(el){el.onclick=function(){toggle(el.getAttribute('data-id'));};});
+  }
+  function geoBadge(o){
+    if(o.geo==='ok')return '<span class="bdg" style="background:#E1F5EE;color:#0F6E56"><i class="ti ti-map-pin-check"></i>на карті</span>';
+    if(o.geo==='outkyiv')return '<span class="bdg" style="background:#FCEBEB;color:#A32D2D"><i class="ti ti-alert-triangle"></i>за межами Києва</span>';
+    return '<span class="bdg" style="background:#FAEEDA;color:#854F0B"><i class="ti ti-map-pin-question"></i>потрібен пін</span>';
+  }
+  function payBadge(o){
+    if(o.payer==='us')return '<span class="bdg" style="background:#EEEDFE;color:#3C3489"><i class="ti ti-cash"></i>платимо ми'+(o.fee?' '+o.fee:'')+'</span>';
+    return '<span class="bdg" style="background:var(--color-background-secondary);color:var(--color-text-secondary)"><i class="ti ti-user-dollar"></i>платить клієнт</span>';
+  }
+  function phoneHtml(o){
+    if(!o.phone)return '';
+    return '<span class="phone" onclick="event.stopPropagation()"><span class="mut" style="font-family:var(--font-mono)">'+o.phone+'</span>'+
+      '<a class="ico" href="tel:'+o.phone+'"><i class="ti ti-phone"></i></a>'+
+      '<a class="ico" href="viber://chat?number=%2B'+o.phone.replace(/\D/g,'')+'"><i class="ti ti-brand-viber"></i></a></span>';
+  }
+  function renderList(){
+    var h='';
+    D.forEach(function(o){
+      h+='<div class="row'+(o.sel?' sel':'')+'" data-id="'+o.id+'">';
+      h+='<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">';
+      h+='<div style="min-width:0"><div style="font-size:13.5px;font-weight:500">'+(o.clean?esc(o.clean):'<span style="color:var(--color-text-tertiary)">адреса не визначена</span>')+'</div>';
+      h+='<div class="mut" style="margin-top:2px"><i class="ti ti-sparkles"></i> з: '+esc(o.raw.slice(0,44))+(o.raw.length>44?'…':'')+'</div>';
+      if(o.code!=='—')h+='<div class="mut" style="margin-top:2px"><i class="ti ti-id"></i> код '+o.code+' → '+(o.payer==='us'?'оплачена нам':'не оплачена')+(o.montage?' · монтаж':'')+'</div>';
+      h+='</div>';
+      h+='<input type="checkbox" '+(o.sel?'checked':'')+' onclick="event.stopPropagation()" data-cb="'+o.id+'" style="width:auto;margin-top:2px"></div>';
+      h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center">'+geoBadge(o)+payBadge(o);
+      if(o.montage)h+='<span class="bdg" style="background:#FAEEDA;color:#854F0B"><i class="ti ti-tool"></i>монтаж</span>';
+      h+='<span class="bdg" style="background:var(--color-background-tertiary);color:var(--color-text-secondary)"><i class="ti ti-clock"></i>гот. '+o.ready+'</span>';
+      h+='<span class="bdg" style="background:var(--color-background-tertiary);color:var(--color-text-secondary)">черга '+o.odate+'</span>';
+      h+='</div>';
+      h+='<div style="margin-top:6px;font-size:12.5px">'+esc(o.name)+(o.phone?' &middot; '+phoneHtml(o):'')+'</div>';
+      if(o.com)h+='<div class="mut" style="margin-top:4px"><i class="ti ti-message-2"></i> '+esc(o.com)+'</div>';
+      if(o.geo==='pin')h+='<button class="btn" style="margin-top:7px" data-pin="'+o.id+'"><i class="ti ti-map-pin-plus"></i>Поставити пін вручну</button>';
+      h+='</div>';
+    });
+    $('list').innerHTML=h;
+    [].forEach.call($('list').querySelectorAll('.row'),function(el){el.onclick=function(){toggle(el.getAttribute('data-id'));};});
+    [].forEach.call($('list').querySelectorAll('[data-cb]'),function(el){el.onclick=function(e){e.stopPropagation();toggle(el.getAttribute('data-cb'));};});
+    [].forEach.call($('list').querySelectorAll('[data-pin]'),function(el){el.onclick=function(e){e.stopPropagation();placePin(el.getAttribute('data-pin'));};});
+  }
+  function bar(){
+    var n=selOrders().length;
+    var km=n?Math.round(n*4+6):0, t=n?Math.round(n*18+20):0;
+    var h='<span class="mut" style="font-size:12.5px">Обрано <b style="color:var(--color-text-primary)">'+n+'</b>'+(n?' · ~'+km+' км · ~'+t+' хв':'')+'</span>';
+    h+='<span style="margin-left:auto;display:inline-flex;gap:6px">';
+    h+='<button class="btn" id="reset">Скинути</button>';
+    h+='<button class="btn pri" id="opt" '+(n<2?'disabled':'')+'><i class="ti ti-route"></i>Оптимізувати</button></span>';
+    $('bar').innerHTML=h;
+    $('opt').onclick=optimize; $('reset').onclick=function(){D.forEach(function(o){o.sel=false;o.st='pending';});full();};
+  }
+  function toggle(id){var o=D.find(function(x){return x.id===id;});if(o.geo==='pin'){return;}o.sel=!o.sel;full();}
+  function placePin(id){var o=D.find(function(x){return x.id===id;});o.geo='ok';o.top=70;o.left=22;o.clean='Демо-адреса (уточнено вручну)';full();}
+  function optimize(){
+    var sel=selOrders().slice().sort(function(a,b){return order.indexOf(a.dist)-order.indexOf(b.dist);});
+    sel.forEach(function(o,i){o.stopNo=i+1;});
+    var dists=[];sel.forEach(function(o){if(dists.indexOf(o.dist)<0)dists.push(o.dist);});
+    var km=Math.round(sel.length*4+6), t=Math.round(sel.length*18+20);
+    var note='Згруповано за районами: '+dists.join(' → ')+'. ';
+    if(sel.some(function(o){return o.geo==='outkyiv';}))note+='⚠ Демидів за межами Києва (+~15 хв). ';
+    if(sel.some(function(o){return o.win;}))note+='Бажано Садова до 18:00 (монтаж). ';
+    note+='~'+sel.length+' зупинок · ~'+km+' км · ~'+t+' хв.';
+    var h='<div class="note"><i class="ti ti-sparkles" style="font-size:16px"></i><div><b>AI-логіст:</b> '+note+'</div></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin:9px 0 2px"><button class="btn" id="back"><i class="ti ti-arrow-left"></i>До списку</button><span class="mut">Старт: депо Здолбунівська 7Д</span></div>';
+    sel.forEach(function(o){
+      var stc=o.st==='pending'?['У цеху','#5F5E5A','var(--color-background-tertiary)']:o.st==='loaded'?['У машині','#854F0B','#FAEEDA']:['Доставлено','#0F6E56','#E1F5EE'];
+      var act=o.st==='pending'?'Завантажити':o.st==='loaded'?'Доставити':'Скасувати';
+      h+='<div class="stop"><div style="display:flex;gap:8px;align-items:flex-start"><span class="num">'+o.stopNo+'</span>';
+      h+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">'+esc(o.clean)+'</div>';
+      h+='<div class="mut" style="margin-top:1px">'+esc(o.name)+(o.phone?' · '+o.phone:'')+' · '+esc(o.dist)+'</div>';
+      if(o.montage)h+='<div class="mut" style="margin-top:3px;color:#854F0B"><i class="ti ti-tool"></i> монтаж — взяти інструмент</div>';
+      if(o.com)h+='<div class="mut" style="margin-top:3px"><i class="ti ti-message-2"></i> '+esc(o.com)+'</div>';
+      h+='<div style="display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap">';
+      h+='<span class="bdg" style="background:'+stc[2]+';color:'+stc[1]+'">'+stc[0]+'</span>';
+      h+='<button class="btn" data-st="'+o.id+'">'+act+'</button></div>';
+      h+='<div style="margin-top:8px;padding-top:7px;border-top:.5px solid var(--color-border-tertiary)">';
+      h+='<span class="mut">Оплата курʼєру (з коду '+o.code+'): </span><span style="display:inline-flex;gap:5px;margin-left:4px">';
+      h+='<button class="pbtn'+(o.payer==='client'?' on':'')+'" data-pay="'+o.id+'" data-v="client">Клієнт</button>';
+      h+='<button class="pbtn'+(o.payer==='us'?' on':'')+'" data-pay="'+o.id+'" data-v="us">Ми</button></span>';
+      if(o.payer==='us')h+='<div class="bdg" style="margin-top:6px;background:#FAEEDA;color:#854F0B"><i class="ti ti-clock"></i>'+(o.fee||'—')+' грн · очікує підтвердження бухгалтера</div>';
+      else h+='<div class="mut" style="margin-top:5px">клієнт платить курʼєру напряму — не в наш розрахунок</div>';
+      h+='</div></div></div></div>';
+    });
+    $('route').innerHTML=h;
+    $('list').style.display='none';$('route').style.display='block';$('bar').style.display='none';
+    $('back').onclick=function(){$('route').style.display='none';$('list').style.display='block';$('bar').style.display='flex';};
+    [].forEach.call($('route').querySelectorAll('[data-st]'),function(el){el.onclick=function(){var o=D.find(function(x){return x.id===el.getAttribute('data-st');});o.st=o.st==='pending'?'loaded':o.st==='loaded'?'delivered':'pending';optimize();};});
+    [].forEach.call($('route').querySelectorAll('[data-pay]'),function(el){el.onclick=function(){var o=D.find(function(x){return x.id===el.getAttribute('data-pay');});o.payer=el.getAttribute('data-v');if(o.payer==='us'&&!o.fee)o.fee=300;optimize();};});
+  }
+  function full(){renderMap();renderList();bar();}
+  full();
+})();
+</script>
+</body>
+</html>
