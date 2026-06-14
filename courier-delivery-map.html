@@ -172,7 +172,8 @@ body{margin:0;background:#dfe3dc}
       if(numbered&&o._n)l=String(o._n);
       if(o.geo==='pin'){c='#b7791f';l='✎';}
       var m=L.marker([o.lat,o.lng],{icon:icon(c,l),draggable:o.pinning===true}).addTo(layer);
-      m.bindPopup('<b>'+(o.clean||o.raw)+'</b><br>'+o.name+' · '+o.dist+(o.by?'<br>обрав: '+o.by:'')+(o.pinning?'<br>перетягни на потрібну адресу':''));
+      m.bindTooltip((o.clean||o.raw)+' · '+o.name+(o.by?' · обрав '+o.by:''));
+      m.on('click',function(){tapAddr(o);});
       if(o.pinning)m.on('dragend',function(e){var ll=e.target.getLatLng();o.lat=ll.lat;o.lng=ll.lng;toast('Пін збережено');});
       pts.push([o.lat,o.lng]);
     });
