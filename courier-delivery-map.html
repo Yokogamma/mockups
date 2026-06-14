@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Розвезення — адресна доставка по Києву (демо)</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,600,700,800,900&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#dfe3dc}
+.cr-app{
+  --bg:#f4f6f1;--surface:#fff;--surface-2:#eef2e8;--ink:#172018;--muted:#647067;--line:#dce3d7;
+  --accent:#4f46e5;--accent-ink:#fff;--loaded:#0f9f6e;--loaded-bg:#dff5eb;--delivered:#0b86b8;--delivered-bg:#dff3fb;
+  --warning:#b7791f;--warning-bg:#fff2cf;--danger:#c93636;--res:#7c5cff;--res-bg:#ece8ff;--lock:#8a8f88;--lock-bg:#eceee9;
+  min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);
+  font-family:Figtree,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:520px;margin:0 auto;border-left:1px solid #cdd3c8;border-right:1px solid #cdd3c8}
+.cr-app.theme-dark{--bg:#111713;--surface:#1d2721;--surface-2:#26342c;--ink:#eef5ec;--muted:#a9b7ab;--line:#354238;--accent:#7c8cff;--accent-ink:#111827;--loaded:#35d49a;--loaded-bg:#183a2b;--delivered:#4fc3ef;--delivered-bg:#163443;--warning:#f4c45f;--warning-bg:#3c3015;--res:#a99bff;--res-bg:#2a2546;--lock:#7c857d;--lock-bg:#222a23}
+.cr-app.theme-warm{--bg:#f8f1e5;--surface:#fffaf1;--surface-2:#f0e2ca;--ink:#2a2118;--muted:#756858;--line:#e2d2b7;--accent:#2f6f68;--accent-ink:#fff;--loaded:#18835f;--loaded-bg:#dbeee2;--delivered:#2c6f9e;--delivered-bg:#dcecf7;--warning:#9a6818;--warning-bg:#f8e4b6;--danger:#b84337;--res:#7c5cff;--res-bg:#efe9d9;--lock:#9a8d79;--lock-bg:#efe6d4}
+.cr-app button,.cr-app select{font:inherit;cursor:pointer}
+.cr-topbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 14px 10px}
+.cr-topbar__inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cr-titleblock h1{margin:0;font-size:22px;line-height:1.05}
+.cr-kicker{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase}
+.cr-user{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.cr-user select{color:var(--ink);border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:6px 8px}
+.cr-theme{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:4px}
+.cr-theme button,.cr-seg button{border:0;border-radius:6px;background:transparent;color:var(--muted);padding:8px;font-weight:700}
+.cr-theme button.on,.cr-seg button.on{background:var(--accent);color:var(--accent-ink)}
+.cr-main{width:100%;padding:12px;display:flex;flex-direction:column;gap:12px}
+.cr-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:4px}
+.cr-seg button{position:relative}
+.cr-seg b{position:absolute;top:2px;right:8px;min-width:18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);padding:0 5px;font-size:10px}
+.cr-seg button.on b{background:var(--accent-ink);color:var(--accent)}
+.cr-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cr-summary div{min-height:70px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 6px;text-align:center}
+.cr-summary b{display:block;color:var(--accent);font-size:23px;line-height:1.1}
+.cr-summary span{display:block;margin-top:4px;color:var(--muted);font-size:11px;font-weight:700}
+#map{height:248px;border:1px solid var(--line);border-radius:8px;z-index:0}
+.mk{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.cr-note{display:flex;gap:7px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--ink);line-height:1.5}
+.cr-list{display:flex;flex-direction:column;gap:10px}
+.cr-order{display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;width:100%;text-align:left;color:var(--ink)}
+.cr-order.is-reserved{background:var(--res-bg)}
+.cr-order.is-loaded{background:var(--loaded-bg)}
+.cr-order.is-delivered{background:var(--delivered-bg)}
+.cr-order.is-locked{opacity:.62}
+.cr-check{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:8px;color:#fff;font-size:14px;font-weight:900;background:var(--surface)}
+.is-reserved .cr-check{border-color:var(--res);background:var(--res)}
+.is-loaded .cr-check{border-color:var(--loaded);background:var(--loaded)}
+.is-delivered .cr-check{border-color:var(--delivered);background:var(--delivered)}
+.is-locked .cr-check{border-color:var(--lock);background:var(--lock-bg);color:var(--lock)}
+.cr-order__body{min-width:0}
+.cr-order__body strong{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-order__body small,.cr-order__body em{display:block;margin-top:2px;color:var(--muted);font-size:12px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-mesh{white-space:nowrap;border-radius:999px;background:var(--surface-2);color:var(--muted);padding:5px 9px;font-size:12px;font-weight:800}
+.cr-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.tag{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px}
+.tag.us{background:var(--res-bg);color:var(--res)}
+.tag.cl{background:var(--surface-2);color:var(--muted)}
+.tag.mo{background:var(--warning-bg);color:var(--warning)}
+.tag.out{background:#fde8e6;color:var(--danger)}
+.cr-rowbtns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 12px;font-weight:800;font-size:13px}
+.btn.pri{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.cr-tabs{position:sticky;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px}
+.cr-tabs button{position:relative;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:6px 2px;font-size:10.5px;font-weight:800}
+.cr-tabs button.on{background:var(--surface-2);color:var(--accent)}
+.cr-tabs span{display:block;font-size:18px;line-height:1;margin-bottom:2px}
+.cr-toast{position:fixed;left:12px;right:12px;bottom:74px;max-width:496px;margin:0 auto;border-radius:10px;background:#111827;color:#fff;padding:11px 14px;text-align:center;font-size:13px;font-weight:800;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60}
+.cr-toast.show{opacity:1}
+.lp{font-size:11px;color:var(--muted);font-weight:700}
+</style>
+</head>
+<body>
+<div class="cr-app theme-light" id="app">
+  <header class="cr-topbar">
+    <div class="cr-topbar__inner">
+      <div class="cr-titleblock"><div class="cr-kicker">Доставка по Києву</div><h1>Розвезення</h1></div>
+      <div class="cr-user">
+        <span class="lp">Я:</span>
+        <select id="me"><option>Вася</option><option>Роман</option><option>Бухгалтер</option></select>
+      </div>
+    </div>
+    <div class="cr-theme" id="theme">
+      <button data-t="light" class="on">Світла</button><button data-t="dark">Темна</button><button data-t="warm">Тепла</button>
+    </div>
+  </header>
+  <main class="cr-main">
+    <div class="cr-seg" id="seg">
+      <button data-v="common" class="on">Спільна карта</button>
+      <button data-v="mine">Моя доставка <b id="mineCount">0</b></button>
+    </div>
+    <div class="cr-summary" id="summary"></div>
+    <div id="map"></div>
+    <div id="note"></div>
+    <div class="cr-list" id="list"></div>
+  </main>
+  <nav class="cr-tabs">
+    <button><span>🏭</span>Цех</button>
+    <button><span>🚚</span>Їде</button>
+    <button><span>📦</span>Доставлено</button>
+    <button><span>📊</span>Звіти</button>
+    <button class="on"><span>🗺️</span>Доставка</button>
+  </nav>
+  <div class="cr-toast" id="toast"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  var DEPOT={lat:50.4565,lng:30.3660,name:'Депо · Здолбунівська 7Д'};
+  var O=[
+    {id:'d01',code:'ДН',name:'Тарас',phone:'+380500000001',clean:'вул. Приозерна, 12, 1 під.',dist:'Оболонь',lat:50.5125,lng:30.4980,payer:'client',fee:null,montage:false,com:'',ready:'13.06 10:20',status:'free',by:null},
+    {id:'d02',code:'ДН',name:'Оксана',phone:'+380500000002',clean:'вул. Контрактова, 4',dist:'Поділ',lat:50.4655,lng:30.5160,payer:'client',fee:null,montage:false,com:'',ready:'13.06 11:40',status:'free',by:null},
+    {id:'d03',code:'ДМО',name:'Степан',phone:'+380500000005',clean:'вул. Квіткова, 18, кв 16',dist:"Солом'янка",lat:50.4305,lng:30.4705,payer:'us',fee:400,montage:true,com:'монтаж — взяти інструмент',ready:'12.06 18:33',status:'free',by:null},
+    {id:'d04',code:'ДМН',name:'Лідія',phone:'+380500000006',clean:'вул. Садова, 3, кв 33',dist:"Солом'янка",lat:50.4280,lng:30.4640,payer:'client',fee:null,montage:true,com:'демо; до 18:00',ready:'13.06 12:07',status:'free',by:null},
+    {id:'d05',code:'ДН',name:'Богдан',phone:'+380500000003',clean:'вул. Лісова, 14, 3 під.',dist:'Печерськ',lat:50.4270,lng:30.5390,payer:'client',fee:null,montage:false,com:'демо коментар',ready:'13.06 16:54',status:'reserved',by:'Роман'},
+    {id:'d06',code:'ДН',name:'Ніна',phone:'+380500000004',clean:'вул. Ентузіастів, 11/1',dist:'Лівобережжя',lat:50.4440,lng:30.5850,payer:'client',fee:null,montage:false,com:'',ready:'12.06 17:02',status:'reserved',by:'Роман'},
+    {id:'d07',code:'ДМО',name:'Юрій',phone:'+380500000007',clean:'смт Демидів (за межами Києва)',dist:'приміська',lat:50.6200,lng:30.3600,payer:'us',fee:1200,montage:true,com:'',ready:'11.06 11:18',status:'free',by:null,out:true},
+  ];
+  var me='Вася', view='common', theme='light';
+  var $=function(s){return document.querySelector(s);};
+  var map, layer;
+  var col={free:'#4f46e5',reserved:'#7c5cff',lock:'#8a8f88',loaded:'#0f9f6e',delivered:'#0b86b8',depot:'#172018',out:'#c93636'};
+
+  function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2400);}
+  function mine(o){return o.by===me;}
+  function inCommon(o){return o.status==='free'||o.status==='reserved';}
+  function inMine(o){return o.by===me && o.status!=='free';}
+  function payerOf(o){return /О/.test(o.code)&&!/Н$/.test(o.code)? (o.code==='ДО'||o.code==='ДМО'?'us':'client') : 'client';}
+
+  function icon(color,label){return L.divIcon({className:'',html:'<span class="mk" style="background:'+color+'">'+label+'</span>',iconSize:[26,26],iconAnchor:[13,13]});}
+
+  function renderMap(){
+    if(!map){
+      map=L.map('map',{zoomControl:true,attributionControl:true}).setView([50.455,30.50],11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+      layer=L.layerGroup().addTo(map);
+    }
+    layer.clearLayers();
+    L.marker([DEPOT.lat,DEPOT.lng],{icon:icon(col.depot,'⌂')}).addTo(layer).bindPopup(DEPOT.name);
+    var pts=[];
+    O.forEach(function(o,i){
+      var show=false,color,label;
+      if(view==='common'){
+        if(!inCommon(o))return;
+        if(o.status==='free'){color=o.out?col.out:col.free;label='';}
+        else {var ok=mine(o);color=ok?col.reserved:col.lock;label=ok?'✓':'🔒';}
+        show=true;
+      } else {
+        if(!inMine(o))return;
+        color=o.status==='reserved'?col.reserved:o.status==='loaded'?col.loaded:col.delivered;
+        label=String(o._n||'');show=true;
+      }
+      if(!show)return;
+      var m=L.marker([o.lat,o.lng],{icon:icon(color,label)}).addTo(layer);
+      m.bindPopup('<b>'+o.clean+'</b><br>'+o.name+' · '+o.dist+(o.by?'<br>обрав: '+o.by:''));
+      m.on('click',function(){act(o);});
+      pts.push([o.lat,o.lng]);
+    });
+    pts.push([DEPOT.lat,DEPOT.lng]);
+    if(pts.length>1){try{map.fitBounds(pts,{padding:[30,30],maxZoom:13});}catch(e){}}
+    setTimeout(function(){map.invalidateSize();},50);
+  }
+
+  function tags(o){
+    var h='';
+    var p=o.status==='free'?(o.code==='ДО'||o.code==='ДМО'?'us':'client'):o.payer;
+    if(o.code==='ДО'||o.code==='ДМО')h+='<span class="tag us">платимо ми'+(o.fee?' '+o.fee:'')+'</span>';
+    else h+='<span class="tag cl">платить клієнт</span>';
+    if(o.montage)h+='<span class="tag mo">монтаж</span>';
+    if(o.out)h+='<span class="tag out">за межами Києва</span>';
+    return h;
+  }
+  function glyph(o){return o.status==='delivered'?'✓':o.status==='loaded'?'🚚':o.status==='reserved'?(mine(o)?'✓':'🔒'):'';}
+
+  function renderList(){
+    var h='', arr;
+    if(view==='common'){arr=O.filter(inCommon);}
+    else {arr=O.filter(inMine);}
+    if(!arr.length){h='<div class="cr-note">'+(view==='common'?'Немає вільних замовлень.':'Ви ще нічого не обрали. Перейдіть на «Спільна карта» і виберіть заказы.')+'</div>';}
+    arr.forEach(function(o){
+      var cls='cr-order';
+      if(view==='common'){ if(o.status==='reserved')cls+=mine(o)?' is-reserved':' is-locked'; }
+      else { cls+=' is-'+o.status; }
+      h+='<div class="'+cls+'" data-id="'+o.id+'" style="cursor:pointer">';
+      h+='<span class="cr-check">'+glyph(o)+'</span>';
+      h+='<span class="cr-order__body"><strong>'+(view==='mine'&&o._n?(o._n+'. '):'')+o.clean+'</strong>';
+      h+='<small>'+o.name+' · '+o.phone+' · '+o.dist+(o.by&&o.by!==me?' · обрав '+o.by:'')+'</small>';
+      h+='<small class="lp">з: '+o.code+' …'+(o.com?' · '+o.com:'')+'</small>';
+      h+='<span class="cr-tags">'+tags(o)+'</span></span>';
+      h+='<span class="cr-mesh">'+(o.status==='delivered'?'✓':view==='mine'?{reserved:'резерв',loaded:'у машині'}[o.status]||'':'')+'</span></div>';
+      if(view==='mine'){
+        h+='<div class="cr-rowbtns" data-row="'+o.id+'">';
+        if(o.status==='reserved'){h+='<button class="btn pri" data-a="load" data-id="'+o.id+'">Завантажити</button><button class="btn" data-a="free" data-id="'+o.id+'">Повернути в пул</button>';}
+        else if(o.status==='loaded'){h+='<button class="btn pri" data-a="deliver" data-id="'+o.id+'">Доставити</button>';}
+        else if(o.status==='delivered'){h+='<button class="btn" data-a="undeliver" data-id="'+o.id+'">Повернути в машину</button>';
+          if(o.payer==='us'||o.code==='ДО'||o.code==='ДМО')h+='<span class="tag us" style="align-self:center">'+(o.fee||'—')+' грн · очікує бухгалтера</span>';}
+        h+='</div>';
+      }
+    });
+    $('#list').innerHTML=h;
+    [].forEach.call(document.querySelectorAll('.cr-order[data-id]'),function(el){el.onclick=function(){act(byId(el.getAttribute('data-id')));};});
+    [].forEach.call(document.querySelectorAll('[data-a]'),function(el){el.onclick=function(e){e.stopPropagation();doAct(el.getAttribute('data-a'),el.getAttribute('data-id'));};});
+  }
+  function byId(id){return O.find(function(x){return x.id===id;});}
+
+  function act(o){
+    if(view==='common'){
+      if(o.status==='free'){o.status='reserved';o.by=me;o.payer=(o.code==='ДО'||o.code==='ДМО')?'us':'client';toast(o.clean+' — обрано вами');renumber();render();}
+      else if(mine(o)){toast('Вже у вашій доставці — на вкладці «Моя доставка»');}
+      else {toast('Вже обрав '+o.by);}
+    }
+  }
+  function doAct(a,id){var o=byId(id);
+    if(a==='free'){o.status='free';o.by=null;}
+    else if(a==='load'){o.status='loaded';}
+    else if(a==='deliver'){o.status='delivered';}
+    else if(a==='undeliver'){o.status='loaded';}
+    renumber();render();toast({free:'Повернуто в пул',load:'Завантажено в машину',deliver:'Доставлено ✓',undeliver:'Повернуто в машину'}[a]);
+  }
+  function renumber(){var n=1;O.forEach(function(o){o._n=null;});O.filter(inMine).sort(function(a,b){return a.dist.localeCompare(b.dist);}).forEach(function(o){o._n=n++;});}
+
+  function renderSummary(){
+    var h='';
+    if(view==='common'){
+      var free=O.filter(function(o){return o.status==='free';}).length;
+      var res=O.filter(function(o){return o.status==='reserved';}).length;
+      var out=O.filter(function(o){return o.status==='free'&&o.out;}).length;
+      h='<div><b>'+free+'</b><span>вільних</span></div><div><b>'+res+'</b><span>зарезервовано</span></div><div><b>'+out+'</b><span>за межами</span></div>';
+    } else {
+      var r=O.filter(function(o){return inMine(o)&&o.status==='reserved';}).length;
+      var l=O.filter(function(o){return inMine(o)&&o.status==='loaded';}).length;
+      var d=O.filter(function(o){return inMine(o)&&o.status==='delivered';}).length;
+      h='<div><b>'+r+'</b><span>резерв</span></div><div><b>'+l+'</b><span>у машині</span></div><div><b>'+d+'</b><span>доставлено</span></div>';
+    }
+    $('#summary').innerHTML=h;
+  }
+  function renderNote(){
+    if(view!=='mine'){$('#note').innerHTML='';return;}
+    var arr=O.filter(inMine);
+    if(arr.length<2){$('#note').innerHTML='';return;}
+    var dists=[];arr.forEach(function(o){if(dists.indexOf(o.dist)<0)dists.push(o.dist);});
+    var km=Math.round(arr.length*4+5),t=Math.round(arr.length*16+18);
+    var s='Маршрут від депо: '+dists.join(' → ')+'. ';
+    if(arr.some(function(o){return o.out;}))s+='⚠ Демидів за межами Києва. ';
+    if(arr.some(function(o){return o.montage;}))s+='Є монтаж — взяти інструмент. ';
+    s+='~'+arr.length+' зупинок · ~'+km+' км · ~'+t+' хв.';
+    $('#note').innerHTML='<div class="cr-note">🧭 <div><b>AI-логіст:</b> '+s+'</div></div>';
+  }
+  function renderSeg(){
+    $('#mineCount').textContent=O.filter(inMine).length;
+    [].forEach.call($('#seg').children,function(b){b.classList.toggle('on',b.getAttribute('data-v')===view);});
+  }
+  function render(){renderSeg();renderSummary();renderNote();renderMap();renderList();}
+
+  $('#me').onchange=function(e){me=e.target.value;renumber();render();toast('Тепер ви: '+me);};
+  [].forEach.call($('#seg').children,function(b){b.onclick=function(){view=b.getAttribute('data-v');render();};});
+  [].forEach.call($('#theme').children,function(b){b.onclick=function(){theme=b.getAttribute('data-t');$('#app').className='cr-app theme-'+theme;[].forEach.call($('#theme').children,function(x){x.classList.toggle('on',x===b);});setTimeout(function(){map&&map.invalidateSize();},60);};});
+
+  renumber();render();
+})();
+</script>
+</body>
+</html>
