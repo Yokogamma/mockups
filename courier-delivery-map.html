@@ -3,91 +3,70 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Розвезення — планування адресної доставки (демо)</title>
+<title>Розвезення — адресна доставка (демо)</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.bunny.net/css?family=figtree:400,600,700,800,900&display=swap">
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#dfe3dc}
+*{box-sizing:border-box}body{margin:0;background:#dfe3dc}
 .cr-app{--bg:#f4f6f1;--surface:#fff;--surface-2:#eef2e8;--ink:#172018;--muted:#647067;--line:#dce3d7;--accent:#4f46e5;--accent-ink:#fff;--loaded:#0f9f6e;--loaded-bg:#dff5eb;--delivered:#0b86b8;--delivered-bg:#dff3fb;--warning:#b7791f;--warning-bg:#fff2cf;--danger:#c93636;--res:#7c5cff;--res-bg:#ece8ff;--lock:#8a8f88;--lock-bg:#eceee9;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font-family:Figtree,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;max-width:520px;margin:0 auto;border-left:1px solid #cdd3c8;border-right:1px solid #cdd3c8}
 .cr-app.theme-dark{--bg:#111713;--surface:#1d2721;--surface-2:#26342c;--ink:#eef5ec;--muted:#a9b7ab;--line:#354238;--accent:#7c8cff;--accent-ink:#111827;--loaded:#35d49a;--loaded-bg:#183a2b;--delivered:#4fc3ef;--delivered-bg:#163443;--warning:#f4c45f;--warning-bg:#3c3015;--danger:#ff746f;--res:#a99bff;--res-bg:#2a2546;--lock:#7c857d;--lock-bg:#222a23}
 .cr-app.theme-warm{--bg:#f8f1e5;--surface:#fffaf1;--surface-2:#f0e2ca;--ink:#2a2118;--muted:#756858;--line:#e2d2b7;--accent:#2f6f68;--accent-ink:#fff;--loaded:#18835f;--loaded-bg:#dbeee2;--delivered:#2c6f9e;--delivered-bg:#dcecf7;--warning:#9a6818;--warning-bg:#f8e4b6;--danger:#b84337;--res:#7c5cff;--res-bg:#efe9d9;--lock:#9a8d79;--lock-bg:#efe6d4}
 .cr-app button,.cr-app select,.cr-app input{font:inherit}.cr-app button{cursor:pointer}
 .cr-topbar{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 14px 10px}
 .cr-topbar__inner{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.cr-titleblock h1{margin:0;font-size:21px;line-height:1.05}
-.cr-kicker{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase}
-.cr-user{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}
-.cr-user select{color:var(--ink);border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:6px 8px}
+.cr-titleblock h1{margin:0;font-size:21px}.cr-kicker{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase}
+.cr-user{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.cr-user select{color:var(--ink);border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:6px 8px}
 .cr-themebtn{width:36px;height:36px;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;font-size:17px}
-.cr-seg,.cr-subseg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:4px}
-.cr-seg{margin-top:10px}.cr-subseg{margin:0}
-.cr-seg button,.cr-subseg button{border:0;border-radius:6px;background:transparent;color:var(--muted);padding:9px;font-weight:800;font-size:13px}
-.cr-seg button.on,.cr-subseg button.on{background:var(--accent);color:var(--accent-ink)}
-.cr-subseg button b{display:inline-block;min-width:18px;margin-left:4px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:10px;padding:0 5px}
-.cr-subseg button.on b{background:var(--accent-ink);color:var(--accent)}
+.cr-subseg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:4px}
+.cr-subseg button{border:0;border-radius:6px;background:transparent;color:var(--muted);padding:9px;font-weight:800;font-size:13px}.cr-subseg button.on{background:var(--accent);color:var(--accent-ink)}
+.cr-subseg b{display:inline-block;min-width:18px;margin-left:4px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:10px;padding:0 5px}.cr-subseg .on b{background:var(--accent-ink);color:var(--accent)}
 .cr-main{width:100%;padding:12px;display:flex;flex-direction:column;gap:12px}
-.cr-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.cr-summary div{min-height:62px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 6px;text-align:center}
-.cr-summary b{display:block;color:var(--accent);font-size:20px}.cr-summary span{display:block;margin-top:3px;color:var(--muted);font-size:11px;font-weight:700}
-.cr-panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
-.cr-panel h3{margin:0;font-size:14px}
+.cr-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cr-summary div{min-height:60px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 6px;text-align:center}.cr-summary b{display:block;color:var(--accent);font-size:20px}.cr-summary span{display:block;margin-top:3px;color:var(--muted);font-size:11px;font-weight:700}
+.cr-panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}.cr-panel h3{margin:0;font-size:14px}
 .cr-slider{display:flex;align-items:center;gap:10px}.cr-slider input{flex:1}.cr-slider b{min-width:60px;text-align:right;color:var(--accent)}
 #map{height:240px;border:1px solid var(--line);border-radius:8px;z-index:0}
 .mk{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
-.cr-routebar{display:flex;justify-content:space-around;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-weight:800}
-.cr-routebar small{display:block;color:var(--muted);font-size:10.5px;font-weight:700;text-align:center}
-.cr-list{display:flex;flex-direction:column;gap:10px}
-.cr-order{display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;color:var(--ink)}
-.cr-order.tap{cursor:pointer}
-.cr-order.is-free{}.cr-order.is-reserved{background:var(--res-bg)}.cr-order.is-loaded{background:var(--loaded-bg)}.cr-order.is-delivered{background:var(--delivered-bg)}.cr-order.is-locked{opacity:.62}.cr-order.is-planned{background:var(--surface-2);border-color:var(--accent)}
-.cr-check{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:8px;color:#fff;font-size:14px;font-weight:900;background:var(--surface)}
-.is-planned .cr-check{border-color:var(--accent);background:var(--accent)}.is-reserved .cr-check{border-color:var(--res);background:var(--res)}.is-loaded .cr-check{border-color:var(--loaded);background:var(--loaded)}.is-delivered .cr-check{border-color:var(--delivered);background:var(--delivered)}.is-locked .cr-check{border-color:var(--lock);background:var(--lock-bg);color:var(--lock)}
-.cr-order__body{min-width:0}
-.cr-order__body strong{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cr-order__body small{display:block;margin-top:2px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cr-mesh{white-space:nowrap;border-radius:999px;background:var(--surface-2);color:var(--muted);padding:5px 9px;font-size:11.5px;font-weight:800}
-.cr-grab{color:var(--muted);font-size:16px;cursor:grab}
-.cr-arrows{display:flex;flex-direction:column;gap:3px}.cr-arrows button{width:28px;height:18px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font-size:10px;line-height:1;color:var(--ink)}
-.cr-ret{width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--muted);font-size:15px}
-.cr-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.tag{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px}
-.tag.us{background:var(--res-bg);color:var(--res)}.tag.cl{background:var(--surface-2);color:var(--muted)}.tag.mo{background:var(--warning-bg);color:var(--warning)}.tag.out{background:#fde8e6;color:var(--danger)}.tag.fee{background:var(--warning-bg);color:var(--warning)}.tag.paid{background:var(--loaded-bg);color:var(--loaded)}
-.star{color:#0f9f6e;font-size:14px}
-.cr-mini{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;grid-column:1 / -1}
-.cr-mini a,.cr-mini button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 9px;font-size:11.5px;font-weight:800;color:var(--ink);text-decoration:none}
-.cr-mini .pri{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
-.cr-mini .g{border-color:#1a73e8;color:#1a73e8}.cr-mini .w{border-color:#1aa6c7;color:#0a8bb0}.cr-mini .ok{border-color:var(--loaded);color:var(--loaded)}.cr-mini .rm{border-color:var(--danger);color:var(--danger)}
-.cr-overall{display:flex;gap:8px}.cr-overall a{flex:1;text-align:center;border-radius:8px;padding:11px;font-weight:800;text-decoration:none}
-.cr-overall .g{background:#1a73e8;color:#fff}.cr-overall .w{background:#19b3d6;color:#03303c}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:10px 12px;font-weight:800;font-size:13px;width:100%}.btn.pri{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}.btn.sm{width:auto;padding:6px 10px;font-size:12px}
+.cr-routebar{display:flex;justify-content:space-around;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-weight:800}.cr-routebar small{display:block;color:var(--muted);font-size:10.5px;font-weight:700;text-align:center}
+.cr-list{display:flex;flex-direction:column;gap:9px}
+.cr-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;cursor:pointer}
+.cr-row.is-reserved{background:var(--res-bg)}.cr-row.is-loaded{background:var(--loaded-bg)}.cr-row.is-delivered{background:var(--delivered-bg)}.cr-row.is-locked{opacity:.6;cursor:default}.cr-row.is-planned{border-color:var(--accent)}.cr-row.is-hidden{opacity:.5}
+.cr-st{width:30px;height:30px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:8px;color:#fff;font-size:14px;font-weight:900;background:var(--surface)}
+.is-planned .cr-st{border-color:var(--accent);background:var(--accent)}.is-reserved .cr-st{border-color:var(--res);background:var(--res)}.is-loaded .cr-st{border-color:var(--loaded);background:var(--loaded)}.is-delivered .cr-st{border-color:var(--delivered);background:var(--delivered)}.is-locked .cr-st{border-color:var(--lock);background:var(--lock-bg);color:var(--lock)}
+.cr-body{flex:1;min-width:0}.cr-body strong{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cr-body small{display:block;margin-top:2px;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cr-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.tag{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px}
+.tag.us{background:var(--res-bg);color:var(--res)}.tag.cl{background:var(--surface-2);color:var(--muted)}.tag.mo{background:var(--warning-bg);color:var(--warning)}.tag.out{background:#fde8e6;color:var(--danger)}.tag.fee{background:var(--warning-bg);color:var(--warning)}.tag.paid{background:var(--loaded-bg);color:var(--loaded)}.tag.hid{background:var(--lock-bg);color:var(--lock)}
+.cr-mesh{white-space:nowrap;border-radius:999px;background:var(--surface-2);color:var(--muted);padding:5px 9px;font-size:11.5px;font-weight:800;flex-shrink:0}
+.cr-arrows{display:flex;flex-direction:column;gap:3px;flex-shrink:0}.cr-arrows button{width:28px;height:18px;border:1px solid var(--line);background:var(--surface);border-radius:5px;font-size:10px;line-height:1;color:var(--ink)}
+.cr-grab{color:var(--muted);font-size:17px;flex-shrink:0;cursor:grab}
+.cr-chev{color:var(--muted);font-size:20px;flex-shrink:0}
+.star{color:#0f9f6e}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:11px 12px;font-weight:800;font-size:13px;width:100%}.btn.pri{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}.btn.sm{width:auto;padding:6px 10px;font-size:12px}
 .cr-empty{color:var(--muted);text-align:center;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:13px}
+.cr-overall{display:flex;gap:8px}.cr-overall a{flex:1;text-align:center;border-radius:8px;padding:11px;font-weight:800;text-decoration:none}.cr-overall .g{background:#1a73e8;color:#fff}.cr-overall .w{background:#19b3d6;color:#03303c}
 .cr-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.cr-chips button{border:1px solid var(--line);background:var(--surface);border-radius:8px;color:var(--muted);padding:8px;font-weight:800;font-size:12.5px}.cr-chips button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .cr-table{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto}.cr-table h3{margin:0 0 8px;font-size:14px}.cr-table table{width:100%;border-collapse:collapse}.cr-table th,.cr-table td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;font-size:12.5px;white-space:nowrap}
 .cr-tabs{position:sticky;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px}
 .cr-tabs button{position:relative;border:0;border-radius:8px;background:transparent;color:var(--muted);padding:7px 2px;font-size:11px;font-weight:800}.cr-tabs button.on{background:var(--surface-2);color:var(--accent)}.cr-tabs span{display:block;font-size:19px;margin-bottom:2px}.cr-tabs b{position:absolute;top:1px;right:calc(50% - 26px);min-width:17px;border-radius:999px;background:var(--danger);color:#fff;padding:0 5px;font-size:10px}
+.cr-modal{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}.cr-shade{position:absolute;inset:0;background:rgba(0,0,0,.45);border:0}
+.cr-sheet{position:relative;width:min(100%,520px);max-height:86vh;overflow-y:auto;border-radius:16px 16px 0 0;background:var(--surface);color:var(--ink);padding:16px}
+.cr-sheet h2{margin:0 0 4px;font-size:18px}.cr-sheet .ph{color:var(--muted);font-weight:800;margin:2px 0 10px}
+.cr-contact{display:flex;gap:8px;margin-bottom:10px}.cr-contact a,.cr-contact button{flex:1;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);padding:10px;font-weight:800;text-decoration:none;text-align:center;font-size:13px}
+.cr-acts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.cr-acts .g{border-color:#1a73e8;color:#1a73e8}.cr-acts .w{border-color:#19b3d6;color:#0a8bb0}.cr-acts .ok{border-color:var(--loaded);color:var(--loaded)}.cr-acts .rm{border-color:var(--danger);color:var(--danger)}
 .cr-toast{position:fixed;left:12px;right:12px;bottom:74px;max-width:496px;margin:0 auto;border-radius:10px;background:#111827;color:#fff;padding:11px 14px;text-align:center;font-size:13px;font-weight:800;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60}.cr-toast.show{opacity:1}
-.lp{font-size:11px;color:var(--muted);font-weight:700}.hint{font-size:11.5px;color:var(--muted);text-align:center}
-.drag-over{outline:2px dashed var(--accent);outline-offset:-2px}
+.lp{font-size:11px;color:var(--muted);font-weight:700}.hint{font-size:11.5px;color:var(--muted);text-align:center}.drag-over{outline:2px dashed var(--accent);outline-offset:-2px}
 </style>
 </head>
 <body>
 <div class="cr-app theme-light" id="app">
   <header class="cr-topbar">
-    <div class="cr-topbar__inner">
-      <div class="cr-titleblock"><div class="cr-kicker" id="kicker"></div><h1>Розвезення</h1></div>
-      <div class="cr-user"><select id="me"><option>Вася</option><option>Роман</option><option>Бухгалтер</option></select><button class="cr-themebtn" id="themebtn">☀</button></div>
-    </div>
-    <div class="cr-seg" id="sec"><button data-s="pickup">🏭 Самовивіз</button><button data-s="address" class="on">🗺️ Адресна доставка</button></div>
+    <div class="cr-topbar__inner"><div class="cr-titleblock"><div class="cr-kicker" id="kicker"></div><h1>Розвезення</h1></div>
+      <div class="cr-user"><select id="me"><option>Вася</option><option>Роман</option><option>Бухгалтер</option></select><button class="cr-themebtn" id="themebtn">☀</button></div></div>
   </header>
   <main class="cr-main" id="main">
-    <div class="cr-summary" id="summary"></div>
-    <div id="panel"></div>
+    <div class="cr-summary" id="summary"></div><div id="panel"></div>
     <div id="mapwrap" style="display:none"><div id="map"></div></div>
-    <div id="subseg"></div>
-    <div id="routebar"></div>
-    <div class="cr-list" id="list"></div>
-    <div id="extra"></div>
+    <div id="subseg"></div><div id="routebar"></div><div class="cr-list" id="list"></div><div id="extra"></div>
   </main>
   <nav class="cr-tabs" id="tabs">
     <button data-t="cex"><span>🏭</span>Цех<b id="b-cex" style="display:none"></b></button>
@@ -96,217 +75,198 @@ body{margin:0;background:#dfe3dc}
     <button data-t="reports"><span>📊</span>Звіти</button>
   </nav>
   <div class="cr-toast" id="toast"></div>
+  <div class="cr-modal" id="cardModal" style="display:none"><button class="cr-shade" data-act="closeCard"></button><div class="cr-sheet" id="cardSheet"></div></div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
   var DEPOT={lat:50.4565,lng:30.3660,name:'Депо · Здолбунівська 7Д'};
   var A=[
-    {id:'a1',code:'ДН',name:'Тарас',phone:'+380500000001',clean:'вул. Приозерна, 12, 1 під.',dist:'Оболонь',lat:50.5125,lng:30.4980,fee:null,montage:false,com:'',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a2',code:'ДН',name:'Оксана',phone:'+380500000002',clean:'вул. Контрактова, 4',dist:'Поділ',lat:50.4655,lng:30.5160,fee:null,montage:false,com:'',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a3',code:'ДМО',name:'Степан',phone:'+380500000005',clean:'вул. Квіткова, 18, кв 16',dist:"Солом'янка",lat:50.4305,lng:30.4705,fee:400,montage:true,com:'монтаж — взяти інструмент',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a4',code:'ДМН',name:'Лідія',phone:'+380500000006',clean:'вул. Садова, 3, кв 33',dist:"Солом'янка",lat:50.4280,lng:30.4640,fee:null,montage:true,com:'до 18:00',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a5',code:'ДН',name:'Богдан',phone:'+380500000003',clean:'вул. Лісова, 14, 3 під.',dist:'Печерськ',lat:50.4270,lng:30.5390,fee:null,montage:false,com:'',st:'reserved',by:'Роман',planned:false,pos:1,confirmed:false,paid:false},
-    {id:'a6',code:'ДН',name:'Ніна',phone:'+380500000004',clean:'вул. Ентузіастів, 11/1',dist:'Лівобережжя',lat:50.4440,lng:30.5850,fee:null,montage:false,com:'',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a7',code:'ДМО',name:'Юрій',phone:'+380500000007',clean:'смт Демидів (за межами Києва)',dist:'приміська',lat:50.6200,lng:30.3600,fee:1200,montage:true,com:'',st:'free',by:null,out:true,planned:false,pos:0,confirmed:false,paid:false},
-    {id:'a8',code:'ДН',name:'Галина',phone:'+380500000008',clean:'вул. Лугова, 5',dist:'Оболонь',lat:50.5180,lng:30.4900,fee:null,montage:false,com:'',st:'free',by:null,planned:false,pos:0,confirmed:false,paid:false},
+    {id:'a1',code:'ДН',name:'Тарас',phone:'+380500000001',clean:'вул. Приозерна, 12, 1 під.',dist:'Оболонь',lat:50.5125,lng:30.4980,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a2',code:'ДН',name:'Оксана',phone:'+380500000002',clean:'вул. Контрактова, 4',dist:'Поділ',lat:50.4655,lng:30.5160,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a3',code:'ДМО',name:'Степан',phone:'+380500000005',clean:'вул. Квіткова, 18, кв 16',dist:"Солом'янка",lat:50.4305,lng:30.4705,fee:400,montage:true,com:'монтаж — взяти інструмент',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a4',code:'ДМН',name:'Лідія',phone:'+380500000006',clean:'вул. Садова, 3, кв 33',dist:"Солом'янка",lat:50.4280,lng:30.4640,fee:null,montage:true,com:'до 18:00',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a5',code:'ДН',name:'Богдан',phone:'+380500000003',clean:'вул. Лісова, 14, 3 під.',dist:'Печерськ',lat:50.4270,lng:30.5390,fee:null,montage:false,com:'',st:'reserved',by:'Роман',planned:false,hidden:false,pos:1,confirmed:false,paid:false},
+    {id:'a6',code:'ДН',name:'Ніна',phone:'+380500000004',clean:'вул. Ентузіастів, 11/1',dist:'Лівобережжя',lat:50.4440,lng:30.5850,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a7',code:'ДМО',name:'Юрій',phone:'+380500000007',clean:'смт Демидів (за межами Києва)',dist:'приміська',lat:50.6200,lng:30.3600,fee:1200,montage:true,com:'',st:'free',by:null,out:true,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a8',code:'ДН',name:'Галина',phone:'+380500000008',clean:'вул. Лугова, 5',dist:'Оболонь',lat:50.5180,lng:30.4900,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
+    {id:'a9',code:'ДН',name:'Степан Б.',phone:'+380500000009',clean:null,raw:'курʼєр уточнить (демо)',dist:'Невідомо',lat:null,lng:null,fee:null,montage:false,com:'потрібен пін',st:'free',by:null,planned:false,hidden:false,pos:0,geo:'pin',confirmed:false,paid:false},
   ];
-  var P=[{id:'p1',num:'k4101',point:'№1 Здолбунівська 7Д',name:'Олена',mesh:3,status:'pending',by:null},{id:'p2',num:'i70776',point:'№1 Здолбунівська 7Д',name:'Андрій',mesh:2,status:'pending',by:null},{id:'p3',num:'k3980',point:'№7 Борщагівська 171',name:'Ірина',mesh:5,status:'pending',by:null}];
-  var me='Вася',section='address',tab='cex',theme='light',hours=3,period='trip',cexView='common',seq=2,dragId=null;
+  var me='Вася',section='address',tab='cex',theme='light',hours=3,period='trip',cexView='common',dragId=null,cardId=null;
   var THEMES=['light','dark','warm'],TICON={light:'☀',dark:'🌙',warm:'♨'};
   var col={free:'#4f46e5',planned:'#4f46e5',reserved:'#7c5cff',star:'#0f9f6e',lock:'#8a8f88',loaded:'#0f9f6e',delivered:'#0b86b8',depot:'#172018',out:'#c93636'};
   var distOrder=['Оболонь','Поділ',"Солом'янка",'Печерськ','Лівобережжя','приміська'];
-  var $=function(s){return document.querySelector(s);};
+  var $=function(s){return document.querySelector(s);};var byId=function(id){return A.find(function(x){return x.id===id;});};
   var map,layer,lastKey='';
-
   function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2300);}
-  function mine(o){return o.by===me;}
-  function isUs(o){return o.code==='ДО'||o.code==='ДМО';}
-  function canManage(){return me==='Роман'||me==='Бухгалтер';}
-  function icon(c,l){return L.divIcon({className:'',html:'<span class="mk" style="background:'+c+'">'+l+'</span>',iconSize:[26,26],iconAnchor:[13,13]});}
-  function myActive(){return A.filter(function(o){return o.by===me&&(o.planned||o.st==='reserved'||o.st==='loaded');});}
-  function myPlan(){return A.filter(function(o){return o.by===me&&(o.planned||o.st==='reserved')&&o.st!=='loaded'&&o.st!=='delivered';}).sort(byPos);}
-  function myRoute(){return A.filter(function(o){return o.by===me&&o.st==='loaded';}).sort(byPos);}
+  function mine(o){return o.by===me;}function isUs(o){return o.code==='ДО'||o.code==='ДМО';}function canManage(){return me==='Роман'||me==='Бухгалтер';}
   function byPos(a,b){return (a.pos||999)-(b.pos||999);}
+  function myActive(){return A.filter(function(o){return o.by===me&&(o.planned||o.st==='reserved'||o.st==='loaded');});}
   function renumber(){myActive().sort(byPos).forEach(function(o,i){o.pos=i+1;});}
   function nextPos(){var m=0;myActive().forEach(function(o){if(o.pos>m)m=o.pos;});return m+1;}
+  function myPlan(){return A.filter(function(o){return o.by===me&&(o.planned||o.st==='reserved')&&o.st!=='loaded'&&o.st!=='delivered';}).sort(byPos);}
+  function myRoute(){return A.filter(function(o){return o.by===me&&o.st==='loaded';}).sort(byPos);}
 
   function ensureMap(){if(map)return;map=L.map('map',{zoomControl:true}).setView([50.455,30.50],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);layer=L.layerGroup().addTo(map);}
+  function mColor(o){if(o.geo==='pin'&&o.lat==null)return null;if(o.st==='reserved')return mine(o)?col.star:col.lock;if(o.st==='loaded')return col.loaded;if(o.st==='delivered')return col.delivered;return o.planned?col.planned:(o.out?col.out:col.free);}
   function drawMap(items,numbered,line,key){
     ensureMap();layer.clearLayers();
-    L.marker([DEPOT.lat,DEPOT.lng],{icon:icon(col.depot,'⌂')}).addTo(layer).bindTooltip(DEPOT.name);
+    L.marker([DEPOT.lat,DEPOT.lng],{icon:L.divIcon({className:'',html:'<span class="mk" style="background:'+col.depot+'">⌂</span>',iconSize:[26,26],iconAnchor:[13,13]})}).addTo(layer).bindTooltip(DEPOT.name);
     var pts=[[DEPOT.lat,DEPOT.lng]];
     items.forEach(function(o){
-      if(o.lat==null)return;var c,l='';
-      if(o.st==='reserved')c=mine(o)?col.star:col.lock,l=mine(o)?'★':'🔒';
-      else if(o.st==='loaded')c=col.loaded;else if(o.st==='delivered')c=col.delivered;
-      else c=o.planned?col.planned:(o.out?col.out:col.free),l=o.planned?'✓':'';
-      if(numbered&&o.pos)l=String(o.pos);
-      if(o.geo==='pin')c='#b7791f',l='✎';
-      var m=L.marker([o.lat,o.lng],{icon:icon(c,l),draggable:o.pinning===true}).addTo(layer);
+      if(o.lat==null||o.hidden)return;var c=mColor(o),l='';
+      if(o.st==='reserved')l=mine(o)?'★':'🔒';else if(o.planned&&o.st==='free')l='✓';
+      if(numbered&&o.pos)l=String(o.pos);if(o.geo==='pin')c='#b7791f',l='✎';
+      var m=L.marker([o.lat,o.lng],{icon:L.divIcon({className:'',html:'<span class="mk" style="background:'+c+'">'+l+'</span>',iconSize:[26,26],iconAnchor:[13,13]}),draggable:o.pinning===true}).addTo(layer);
       m.bindTooltip((o.pos?o.pos+'. ':'')+(o.clean||o.raw)+' · '+o.name);
-      m.on('click',function(){tapAddr(o);});
+      m.on('click',function(){openCard(o.id);});
       if(o.pinning)m.on('dragend',function(e){var ll=e.target.getLatLng();o.lat=ll.lat;o.lng=ll.lng;toast('Пін збережено');});
       pts.push([o.lat,o.lng]);
     });
-    if(line){var seqp=items.slice().filter(function(o){return o.lat!=null;}).sort(byPos).map(function(o){return [o.lat,o.lng];});if(seqp.length)L.polyline([[DEPOT.lat,DEPOT.lng]].concat(seqp),{color:col.loaded,weight:3,opacity:.6,dashArray:'6 6'}).addTo(layer);}
-    map.invalidateSize();
-    if(key!==lastKey){lastKey=key;if(pts.length>1){try{map.fitBounds(pts,{padding:[28,28],maxZoom:13});}catch(e){}}}
+    if(line){var sp=items.filter(function(o){return o.lat!=null&&!o.hidden;}).sort(byPos).map(function(o){return [o.lat,o.lng];});if(sp.length)L.polyline([[DEPOT.lat,DEPOT.lng]].concat(sp),{color:col.loaded,weight:3,opacity:.6,dashArray:'6 6'}).addTo(layer);}
+    map.invalidateSize();if(key!==lastKey){lastKey=key;if(pts.length>1){try{map.fitBounds(pts,{padding:[28,28],maxZoom:13});}catch(e){}}}
   }
-
-  function hav(a,b){var R=6371,d2r=Math.PI/180,dLat=(b.lat-a.lat)*d2r,dLng=(b.lng-a.lng)*d2r,la1=a.lat*d2r,la2=b.lat*d2r;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)*Math.sin(dLng/2);return 2*R*Math.asin(Math.sqrt(x));}
-  function routeStats(stops){var km=0,prev=DEPOT;stops.forEach(function(o){if(o.lat==null)return;km+=hav(prev,o);prev=o;});km*=1.35;var min=Math.round(km/20*60+stops.length*10);return {km:Math.round(km),min:min};}
+  function hav(a,b){var R=6371,d=Math.PI/180,dLat=(b.lat-a.lat)*d,dLng=(b.lng-a.lng)*d,la1=a.lat*d,la2=b.lat*d;var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(la1)*Math.cos(la2)*Math.sin(dLng/2)*Math.sin(dLng/2);return 2*R*Math.asin(Math.sqrt(x));}
+  function routeStats(stops){var s=stops.filter(function(o){return o.lat!=null&&!o.hidden;});var km=0,prev=DEPOT;s.forEach(function(o){km+=hav(prev,o);prev=o;});km*=1.35;return {km:Math.round(km),min:Math.round(km/20*60+s.length*10),n:s.length};}
   function fmtMin(m){return m>=60?Math.floor(m/60)+' год '+(m%60)+' хв':m+' хв';}
-  function gAll(stops){var pts=[DEPOT].concat(stops.filter(function(o){return o.lat!=null;}));if(pts.length<2)return '#';var o=pts[0],d=pts[pts.length-1],mid=pts.slice(1,-1).map(function(x){return x.lat+','+x.lng;}).join('|');return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+o.lat+','+o.lng+'&destination='+d.lat+','+d.lng+(mid?'&waypoints='+encodeURIComponent(mid):'');}
+  function gAll(stops){var pts=[DEPOT].concat(stops.filter(function(o){return o.lat!=null&&!o.hidden;}));if(pts.length<2)return '#';var o=pts[0],d=pts[pts.length-1],mid=pts.slice(1,-1).map(function(x){return x.lat+','+x.lng;}).join('|');return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+o.lat+','+o.lng+'&destination='+d.lat+','+d.lng+(mid?'&waypoints='+encodeURIComponent(mid):'');}
   function gTo(o){return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+DEPOT.lat+','+DEPOT.lng+'&destination='+o.lat+','+o.lng;}
   function wTo(o){return 'https://waze.com/ul?ll='+o.lat+','+o.lng+'&navigate=yes';}
+  function tags(o){var h=isUs(o)?'<span class="tag us">платимо ми'+(o.fee?' '+o.fee:'')+'</span>':'<span class="tag cl">платить клієнт</span>';if(o.montage)h+='<span class="tag mo">монтаж</span>';if(o.out)h+='<span class="tag out">за межами</span>';if(o.hidden)h+='<span class="tag hid">сховано</span>';if(o.st==='delivered'&&isUs(o))h+=(o.paid?'<span class="tag paid">оплачено</span>':o.confirmed?'<span class="tag fee">до сплати '+o.fee+'</span>':'<span class="tag fee">очікує підтв. '+o.fee+'</span>');return h;}
+  function stGlyph(o){if(o.geo==='pin'&&o.lat==null)return '✎';if(o.st==='reserved')return mine(o)?'★':'🔒';if(o.st==='loaded')return '🚚';if(o.st==='delivered')return '✓';return o.planned?'✓':'';}
+  function stClass(o){if(o.st==='reserved')return mine(o)?'is-reserved':'is-locked';if(o.st==='loaded')return 'is-loaded';if(o.st==='delivered')return 'is-delivered';if(o.planned)return 'is-planned';return 'is-free';}
+  function stBadge(o){if(o.st==='reserved')return mine(o)?'резерв':'зайнято';if(o.st==='loaded')return 'у машині';if(o.st==='delivered')return '✓';if(o.planned)return o.hidden?'сховано':'в плані';if(o.geo==='pin'&&o.lat==null)return 'пін';return 'вільне';}
 
-  function tags(o){var h=isUs(o)?'<span class="tag us">платимо ми'+(o.fee?' '+o.fee:'')+'</span>':'<span class="tag cl">платить клієнт</span>';if(o.montage)h+='<span class="tag mo">монтаж</span>';if(o.out)h+='<span class="tag out">за межами</span>';return h;}
-
-  function commonRow(o){
-    var locked=o.st==='reserved'&&!mine(o);var needPin=o.geo==='pin'&&o.lat==null;
-    var stcls=o.st==='reserved'?(locked?'is-locked':'is-reserved'):(o.planned?'is-planned':'is-free');
-    var glyph=o.st==='reserved'?(mine(o)?'★':'🔒'):(o.planned?'✓':'');
-    var h='<div class="cr-order tap '+stcls+'" data-act="tap" data-id="'+o.id+'">';
-    h+='<span class="cr-check">'+(needPin?'✎':glyph)+'</span>';
-    h+='<span class="cr-order__body"><strong>'+(o.st==='reserved'&&mine(o)?'<span class="star">★</span> ':'')+(o.clean||('<span style="color:var(--warning)">'+o.raw+'</span>'))+'</strong>';
-    h+='<small>'+o.name+' · '+o.phone+' · '+o.dist+(o.by&&!mine(o)?' · обрав '+o.by:'')+'</small>';
-    h+='<span class="cr-tags">'+tags(o)+(needPin?'<span class="tag mo">потрібен пін</span>':'')+'</span></span>';
-    h+='<span class="cr-mesh">'+(o.st==='reserved'?(mine(o)?'резерв':'зайнято'):o.planned?'в плані':'вільне')+'</span>';
-    if(needPin)h+='<button class="cr-ret" data-act="pin" data-id="'+o.id+'" style="width:auto;padding:6px 8px">✎</button>';
-    else if(locked&&canManage())h+='<button class="cr-ret" data-act="release" data-id="'+o.id+'">⟲</button>';
-    else if(o.st==='reserved'&&mine(o))h+='<button class="cr-ret" data-act="load" data-id="'+o.id+'" title="Завантажити">🚚</button>';
-    else h+='<span></span>';
+  function row(o,opts){opts=opts||{};
+    var h='<div class="cr-row '+stClass(o)+(o.hidden?' is-hidden':'')+'" data-card="'+o.id+'">';
+    if(opts.reorder)h+='<span class="cr-arrows"><button data-act="up" data-id="'+o.id+'">▲</button><button data-act="down" data-id="'+o.id+'">▼</button></span>';
+    h+='<span class="cr-st">'+stGlyph(o)+'</span>';
+    h+='<span class="cr-body"><strong>'+(o.pos&&opts.num?o.pos+'. ':'')+(o.st==='reserved'&&mine(o)?'<span class="star">★</span> ':'')+(o.clean||('<span style="color:var(--warning)">'+o.raw+'</span>'))+'</strong>';
+    h+='<small>'+o.name+' · '+o.dist+(o.by&&!mine(o)?' · обрав '+o.by:'')+'</small>';
+    h+='<span class="cr-tags">'+tags(o)+'</span></span>';
+    h+='<span class="cr-mesh">'+stBadge(o)+'</span>';
+    h+=opts.reorder?'<span class="cr-grab" draggable="true" data-drag="'+o.id+'">⠿</span>':'<span class="cr-chev">›</span>';
     h+='</div>';return h;
   }
-  function planRow(o){
-    var h='<div class="cr-order is-'+(o.st==='reserved'?'reserved':'planned')+'" draggable="true" data-drag="'+o.id+'" data-id="'+o.id+'">';
-    h+='<span class="cr-arrows"><button data-act="up" data-id="'+o.id+'">▲</button><button data-act="down" data-id="'+o.id+'">▼</button></span>';
-    h+='<span class="cr-order__body"><strong>'+o.pos+'. '+o.clean+'</strong><small>'+o.name+' · '+o.dist+'</small><span class="cr-tags">'+tags(o)+'</span>';
-    h+='<span class="cr-mini">';
-    if(o.st!=='reserved')h+='<button class="pri" data-act="reserve" data-id="'+o.id+'">★ в резерв</button>';
-    else h+='<button class="ok" data-act="load" data-id="'+o.id+'">🚚 завантажити</button>';
-    h+='<button class="rm" data-act="remove" data-id="'+o.id+'">видалити</button></span></span>';
-    h+='<span class="cr-grab" title="Перетягнути">⠿</span><span></span></div>';return h;
-  }
-  function routeRow(o){
-    var h='<div class="cr-order is-loaded" draggable="true" data-drag="'+o.id+'" data-id="'+o.id+'">';
-    h+='<span class="cr-arrows"><button data-act="up" data-id="'+o.id+'">▲</button><button data-act="down" data-id="'+o.id+'">▼</button></span>';
-    h+='<span class="cr-order__body"><strong>'+o.pos+'. '+o.clean+'</strong><small>'+o.name+' · '+o.phone+' · '+o.dist+'</small><span class="cr-tags">'+tags(o)+'</span>';
-    h+='<span class="cr-mini"><a class="g" target="_blank" href="'+gTo(o)+'">Google</a><a class="w" target="_blank" href="'+wTo(o)+'">Waze</a><button class="ok" data-act="deliver" data-id="'+o.id+'">✓ доставлено</button><button class="rm" data-act="return" data-id="'+o.id+'">в цех</button></span></span>';
-    h+='<span class="cr-grab">⠿</span><span></span></div>';return h;
-  }
 
-  function tapAddr(o){
-    if(tab!=='cex')return;
-    if(o.st==='free'){if(!o.planned){o.planned=true;o.by=me;o.pos=nextPos();toast('Додано в план');}else{o.planned=false;o.by=null;o.pos=0;renumber();toast('Прибрано з плану');}render();}
-    else if(o.st==='reserved'&&mine(o)){o.st='loaded';renumber();toast('Завантажено в машину');render();}
-    else if(o.st==='reserved'){toast('Зайнято: '+o.by);}
+  function openCard(id){cardId=id;var o=byId(id);var h='<h2>'+(o.clean||o.raw)+'</h2><div class="ph">'+o.name+' · '+o.phone+' · '+o.dist+'</div>';
+    h+='<div class="cr-tags" style="margin-bottom:10px">'+tags(o)+'</div>';
+    if(o.com)h+='<div class="hint" style="text-align:left;margin-bottom:10px">💬 '+o.com+'</div>';
+    if(o.phone)h+='<div class="cr-contact"><a href="tel:'+o.phone+'">Дзвінок</a><a href="viber://chat?number=%2B'+o.phone.replace(/\\D/g,'')+'">Viber</a><button data-act="copy" data-id="'+o.id+'">Копія</button></div>';
+    h+='<div class="cr-acts">'+cardActions(o)+'</div>';
+    h+='<button class="btn" style="margin-top:10px" data-act="closeCard">Закрити</button>';
+    $('#cardSheet').innerHTML=h;$('#cardModal').style.display='flex';
+  }
+  function cardActions(o){var b=[];
+    if(o.geo==='pin'&&o.lat==null){b.push(['pin','✎ Поставити пін','pri']);return mk(b);}
+    if(o.st==='free'&&!o.planned){b.push(['plan','➕ В план','pri']);b.push(['tomachine','🚚 В машину (без плану)','']);}
+    else if(o.st==='free'&&o.planned){b.push(['reserve','★ В резерв','pri']);b.push([o.hidden?'show':'hide',o.hidden?'👁 Показати в маршруті':'🚫 Сховати з маршруту','']);b.push(['remove','✕ Видалити з плану','rm']);}
+    else if(o.st==='reserved'&&mine(o)){b.push(['load','🚚 Завантажити в машину','pri']);b.push(['unreserve','✕ Зняти резерв','rm']);}
+    else if(o.st==='reserved'&&!mine(o)){if(canManage())b.push(['release','⟲ Звільнити резерв ('+o.by+')','rm']);else b.push(['none','🔒 Зайнято: '+o.by,'']);}
+    else if(o.st==='loaded'){b.push(['deliver','✓ Доставлено','pri ok']);b.push(['gg','Маршрут Google','g']);b.push(['ww','Маршрут Waze','w']);b.push(['returncex','↩ Повернути в цех','rm']);}
+    else if(o.st==='delivered'){b.push(['undeliver','↩ Повернути в машину','']);}
+    return mk(b);
+  }
+  function mk(b){return b.map(function(x){if(x[0]==='gg')return '<a class="btn g" target="_blank" href="'+gTo(byId(cardId))+'">'+x[1]+'</a>';if(x[0]==='ww')return '<a class="btn w" target="_blank" href="'+wTo(byId(cardId))+'">'+x[1]+'</a>';if(x[0]==='none')return '<div class="btn" style="opacity:.6">'+x[1]+'</div>';return '<button class="btn '+x[2]+'" data-act="'+x[0]+'" data-id="'+cardId+'">'+x[1]+'</button>';}).join('');}
+  function closeCard(){$('#cardModal').style.display='none';cardId=null;}
+
+  function doAct(a,id){var o=byId(id);
+    if(a==='plan'){o.planned=true;o.by=me;o.pos=nextPos();toast('Додано в план');}
+    else if(a==='tomachine'){o.st='loaded';o.by=me;o.planned=false;o.pos=nextPos();toast('Завантажено в машину (без плану)');}
+    else if(a==='reserve'){o.st='reserved';o.planned=false;toast('★ Зарезервовано');}
+    else if(a==='hide'){o.hidden=true;toast('Сховано з маршруту (лишилось у плані)');}
+    else if(a==='show'){o.hidden=false;toast('Повернуто в маршрут');}
+    else if(a==='remove'){o.st='free';o.planned=false;o.hidden=false;o.by=null;o.pos=0;renumber();toast('Видалено з плану');}
+    else if(a==='load'){o.st='loaded';renumber();toast('Завантажено в машину');}
+    else if(a==='unreserve'){o.st='free';o.planned=true;toast('Резерв знято (лишилось у плані)');}
+    else if(a==='deliver'){o.st='delivered';renumber();toast('Доставлено ✓ — прибрано з маршруту');}
+    else if(a==='returncex'){o.st='free';o.planned=false;o.hidden=false;o.by=null;o.pos=0;renumber();toast('Повернуто в цех');}
+    else if(a==='undeliver'){o.st='loaded';renumber();toast('Повернуто в машину');}
+    else if(a==='release'){o.st='free';o.by=null;o.pos=0;toast('Керівник звільнив резерв');}
+    else if(a==='pin'){o.lat=50.452;o.lng=30.515;o.pinning=true;o.clean=o.clean||'Адреса (на карті)';toast('Перетягни маркер ✎ на адресу');}
+    else if(a==='copy'){toast('Скопійовано: '+o.phone);return;}
+    closeCard();render();
   }
   function reorder(id,dir){var arr=(tab==='cex'?myPlan():myRoute());var i=arr.findIndex(function(x){return x.id===id;});var j=i+dir;if(j<0||j>=arr.length)return;var t=arr[i].pos;arr[i].pos=arr[j].pos;arr[j].pos=t;render();}
-  function dropReorder(srcId,tgtId){if(srcId===tgtId)return;var arr=(tab==='cex'?myPlan():myRoute());var src=arr.find(function(x){return x.id===srcId;}),tgt=arr.find(function(x){return x.id===tgtId;});if(!src||!tgt)return;arr=arr.filter(function(x){return x.id!==srcId;});var ti=arr.findIndex(function(x){return x.id===tgtId;});arr.splice(ti,0,src);arr.forEach(function(o,i){o.pos=i+1;});render();}
-  function tapPickup(o){if(o.status==='pending'){o.status='loaded';o.by=me;}else if(o.status==='loaded'&&o.by===me){o.status='delivered';}else if(o.status==='delivered'&&o.by===me){o.status='loaded';}else{toast('Зайнято: '+o.by);return;}render();}
-
-  function aiPlan(){var free=A.filter(function(o){return o.st==='free'&&!o.planned;});free.sort(function(a,b){return (a.out?1:0)-(b.out?1:0)||distOrder.indexOf(a.dist)-distOrder.indexOf(b.dist);});var cap=Math.max(1,Math.floor((hours*60-15)/25));free.slice(0,cap).forEach(function(o){o.planned=true;o.by=me;o.pos=nextPos();});renumber();cexView='mine';toast('AI: на '+hours+' год — '+Math.min(cap,free.length)+' заказів у план');render();}
-
+  function dropReorder(s,t){if(s===t)return;var arr=(tab==='cex'?myPlan():myRoute());var src=arr.find(function(x){return x.id===s;});if(!src)return;arr=arr.filter(function(x){return x.id!==s;});var ti=arr.findIndex(function(x){return x.id===t;});arr.splice(ti<0?arr.length:ti,0,src);arr.forEach(function(o,i){o.pos=i+1;});render();}
+  function aiPlan(){var free=A.filter(function(o){return o.st==='free'&&!o.planned&&o.lat!=null;});free.sort(function(a,b){return (a.out?1:0)-(b.out?1:0)||distOrder.indexOf(a.dist)-distOrder.indexOf(b.dist);});var cap=Math.max(1,Math.floor((hours*60-15)/25));free.slice(0,cap).forEach(function(o){o.planned=true;o.by=me;o.pos=nextPos();});renumber();cexView='mine';toast('AI: на '+hours+' год — '+Math.min(cap,free.length)+' у план');render();}
   function sumHtml(c){return c.map(function(x){return '<div><b>'+x[0]+'</b><span>'+x[1]+'</span></div>';}).join('');}
 
   function renderAddress(){
     var showMap=false,panel='',list='',extra='',sum='',sub='',rb='';
     if(tab==='cex'){
-      showMap=true;
-      var planN=myPlan().length;
-      if(planN>0)sub='<div class="cr-subseg"><button data-act="cv" data-v="common" class="'+(cexView==='common'?'on':'')+'">Спільна карта</button><button data-act="cv" data-v="mine" class="'+(cexView==='mine'?'on':'')+'">Моя карта <b>'+planN+'</b></button></div>';
-      else cexView='common';
+      showMap=true;var plan=myPlan();
+      if(plan.length>0)sub='<div class="cr-subseg"><button data-act="cv" data-v="common" class="'+(cexView==='common'?'on':'')+'">Спільна карта</button><button data-act="cv" data-v="mine" class="'+(cexView==='mine'?'on':'')+'">Моя карта <b>'+plan.length+'</b></button></div>';else cexView='common';
       if(cexView==='mine'){
-        var plan=myPlan();var rs=routeStats(plan);
-        sum=sumHtml([[plan.length,'у плані'],[plan.filter(function(o){return o.st==='reserved';}).length,'зарезервовано'],['~'+rs.km,'км']]);
-        rb='<div class="cr-routebar"><div>'+rs.km+' км<small>дистанція</small></div><div>'+fmtMin(rs.min)+'<small>≈ час</small></div><div>'+plan.length+'<small>точок</small></div></div>';
-        list=plan.length?plan.map(planRow).join(''):'<div class="cr-empty">План порожній</div>';
-        extra='<div class="hint">Перетягни ⠿ або ▲▼ — порядок плану. «★ в резерв» закріплює (інші не візьмуть). Завантажити — у машину.</div>';
+        var rs=routeStats(plan);
+        sum=sumHtml([[plan.length,'у плані'],[plan.filter(function(o){return o.st==='reserved';}).length,'резерв'],['~'+rs.km,'км (без схованих)']]);
+        rb='<div class="cr-routebar"><div>'+rs.km+' км<small>дистанція</small></div><div>'+fmtMin(rs.min)+'<small>≈ час</small></div><div>'+rs.n+'<small>у маршруті</small></div></div>';
+        list=plan.length?plan.map(function(o){return row(o,{reorder:true,num:true});}).join(''):'<div class="cr-empty">План порожній</div>';
+        extra='<div class="hint">Тап по заказу — картка дій. ⠿/▲▼ — порядок. Сховати = тимчасово прибрати з маршруту (лишається в плані).</div>';
       } else {
         var free=A.filter(function(o){return o.st==='free'&&!o.planned;});
-        sum=sumHtml([[free.length,'вільних'],[planN,'мій план'],[A.filter(function(o){return o.st==='reserved'&&mine(o);}).length,'резерв']]);
-        panel='<div class="cr-panel"><h3>🧭 AI-планувальник виїзду з депо</h3><div class="cr-slider"><span class="lp">Бюджет</span><input type="range" data-act="hours" min="1" max="10" step="1" value="'+hours+'"><b>'+hours+' год</b></div><button class="btn pri" data-act="plan">AI-план на '+hours+' год</button><div class="hint">Обери заказы галочкою (тап) — зʼявиться «Моя карта» для планування.</div></div>';
+        sum=sumHtml([[free.length,'вільних'],[plan.length,'мій план'],[A.filter(function(o){return o.st==='reserved'&&mine(o);}).length,'резерв']]);
+        panel='<div class="cr-panel"><h3>🧭 AI-планувальник виїзду з депо</h3><div class="cr-slider"><span class="lp">Бюджет</span><input type="range" data-act="hours" min="1" max="10" step="1" value="'+hours+'"><b>'+hours+' год</b></div><button class="btn pri" data-act="aiplan">AI-план на '+hours+' год</button><div class="hint">Тап по заказу — картка дій: «В план» або «В машину» (без плану).</div></div>';
         var pool=A.filter(function(o){return o.st==='free'||o.st==='reserved';}).sort(function(a,b){var ra=a.st==='reserved'?0:a.planned?1:2,rb2=b.st==='reserved'?0:b.planned?1:2;return ra-rb2||byPos(a,b);});
-        list=pool.length?pool.map(commonRow).join(''):'<div class="cr-empty">Пул порожній</div>';
+        list=pool.length?pool.map(function(o){return row(o,{});}).join(''):'<div class="cr-empty">Пул порожній</div>';
       }
     } else if(tab==='route'){
-      showMap=true;
-      var rt=myRoute();var rs2=routeStats(rt);
-      sum=sumHtml([[rt.length,'у машині'],['~'+rs2.km,'км'],[fmtMin(rs2.min).replace(' хв',''),'≈ час']]);
-      rb='<div class="cr-routebar"><div>'+rs2.km+' км<small>дистанція</small></div><div>'+fmtMin(rs2.min)+'<small>≈ час</small></div><div>'+rt.length+'<small>точок</small></div></div>';
-      if(rt.length)panel='<div class="cr-overall"><a class="g" target="_blank" href="'+gAll(rt)+'">Маршрут у Google</a><a class="w" target="_blank" href="'+wTo(rt[0])+'">Перша у Waze</a></div>';
-      list=rt.length?rt.map(routeRow).join(''):'<div class="cr-empty">У машині порожньо. Заплануй на «Цех» → зарезервуй → завантаж.</div>';
-      extra='<div class="hint">Порядок з плану збережено; нові «прямо в машину» — після. ⠿/▲▼ — переставити. Старт зі Здолбунівської.</div>';
+      showMap=true;var rt=myRoute();var rs2=routeStats(rt);
+      sum=sumHtml([[rt.length,'у машині'],['~'+rs2.km,'км'],[fmtMin(rs2.min),'≈ час']]);
+      rb='<div class="cr-routebar"><div>'+rs2.km+' км<small>дистанція</small></div><div>'+fmtMin(rs2.min)+'<small>≈ час</small></div><div>'+rs2.n+'<small>точок</small></div></div>';
+      if(rt.length)panel='<div class="cr-overall"><a class="g" target="_blank" href="'+gAll(rt)+'">Весь маршрут у Google</a><a class="w" target="_blank" href="'+wTo(rt[0])+'">Перша у Waze</a></div>';
+      list=rt.length?rt.map(function(o){return row(o,{reorder:true,num:true});}).join(''):'<div class="cr-empty">У машині порожньо. На «Цех»: «В план»→резерв→завантаж, або «В машину» одразу.</div>';
+      extra='<div class="hint">Тап — картка (Google/Waze/доставлено). ⠿/▲▼ — порядок. Старт зі Здолбунівської.</div>';
     } else if(tab==='delivered'){
       var dl=A.filter(function(o){return o.by===me&&o.st==='delivered';});
       sum=sumHtml([[dl.length,'доставлено'],[dl.filter(isUs).length,'оплата нам'],[dl.filter(isUs).reduce(function(s,o){return s+(o.fee||0);},0),'сума']]);
-      list=dl.length?dl.map(function(o){return '<div class="cr-order is-delivered tap" data-act="undeliver" data-id="'+o.id+'"><span class="cr-check">✓</span><span class="cr-order__body"><strong>'+o.clean+'</strong><small>'+o.name+' · '+o.dist+'</small><span class="cr-tags">'+tags(o)+(isUs(o)?(o.paid?'<span class="tag paid">оплачено</span>':o.confirmed?'<span class="tag fee">до сплати '+o.fee+'</span>':'<span class="tag fee">очікує підтв. '+o.fee+'</span>'):'')+'</span></span><span class="cr-mesh">✓</span><span></span></div>';}).join(''):'<div class="cr-empty">Ще нічого не доставлено</div>';
+      list=dl.length?dl.map(function(o){return row(o,{});}).join(''):'<div class="cr-empty">Ще нічого не доставлено</div>';
     } else {
       var d2=A.filter(function(o){return o.st==='delivered';});
-      var due=d2.filter(function(o){return isUs(o)&&o.confirmed&&!o.paid;}).reduce(function(s,o){return s+(o.fee||0);},0);
-      var paid=d2.filter(function(o){return isUs(o)&&o.paid;}).reduce(function(s,o){return s+(o.fee||0);},0);
+      var due=d2.filter(function(o){return isUs(o)&&o.confirmed&&!o.paid;}).reduce(function(s,o){return s+(o.fee||0);},0),paid=d2.filter(function(o){return isUs(o)&&o.paid;}).reduce(function(s,o){return s+(o.fee||0);},0);
       sum=sumHtml([[d2.length,'доставок'],[due,'до сплати'],[paid,'оплачено']]);
       panel=canManage()?'<div class="cr-chips"><button data-act="period" data-p="trip" class="'+(period==='trip'?'on':'')+'">За доставку</button><button data-act="period" data-p="day" class="'+(period==='day'?'on':'')+'">День</button><button data-act="period" data-p="week" class="'+(period==='week'?'on':'')+'">Тиждень</button></div>':'';
       var cs={};d2.forEach(function(o){var c=o.by||'?';cs[c]=cs[c]||{n:0,pend:0,due:0,paid:0};cs[c].n++;if(isUs(o)){if(o.paid)cs[c].paid+=(o.fee||0);else if(o.confirmed)cs[c].due+=(o.fee||0);else cs[c].pend+=(o.fee||0);}});
-      var rows='';Object.keys(cs).forEach(function(c){var v=cs[c];var btn='';if(canManage()){if(v.pend>0)btn='<button class="btn sm pri" data-act="confirm" data-c="'+c+'">Підтвердити '+v.pend+'</button>';else if(v.due>0)btn='<button class="btn sm pri" data-act="pay" data-c="'+c+'">Оплатити '+v.due+'</button>';else if(v.paid>0)btn='<span class="tag paid">✓</span>';}rows+='<tr><td>'+c+'</td><td>'+v.n+'</td><td>'+v.pend+'</td><td>'+v.due+'</td><td>'+v.paid+'</td><td style="text-align:right">'+btn+'</td></tr>';});
-      extra='<div class="cr-table"><h3>Адресні доставки — розрахунок</h3><table><thead><tr><th>Курʼєр</th><th>Дост.</th><th>Підтв?</th><th>До сплати</th><th>Оплач.</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="lp">немає</td></tr>')+'</tbody></table><div class="hint" style="margin-top:8px">'+(canManage()?'Керівник: підтвердити суму → оплатити (тільки payer=ми).':'Лише перегляд.')+'</div></div>';
+      var rows='';Object.keys(cs).forEach(function(c){var v=cs[c],btn='';if(canManage()){if(v.pend>0)btn='<button class="btn sm pri" data-act="confirm" data-c="'+c+'">Підтвердити '+v.pend+'</button>';else if(v.due>0)btn='<button class="btn sm pri" data-act="pay" data-c="'+c+'">Оплатити '+v.due+'</button>';else if(v.paid>0)btn='<span class="tag paid">✓</span>';}rows+='<tr><td>'+c+'</td><td>'+v.n+'</td><td>'+v.pend+'</td><td>'+v.due+'</td><td>'+v.paid+'</td><td style="text-align:right">'+btn+'</td></tr>';});
+      extra='<div class="cr-table"><h3>Адресні доставки — розрахунок</h3><table><thead><tr><th>Курʼєр</th><th>Дост.</th><th>Підтв?</th><th>До сплати</th><th>Оплач.</th><th></th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="lp">немає</td></tr>')+'</tbody></table><div class="hint" style="margin-top:8px">'+(canManage()?'Керівник: підтвердити суму → оплатити.':'Лише перегляд.')+'</div></div>';
     }
     var mapItems=tab==='cex'?(cexView==='mine'?myPlan():A.filter(function(o){return o.st==='free'||o.st==='reserved';})):(tab==='route'?myRoute():[]);
     return {showMap:showMap,sum:sum,panel:panel,sub:sub,rb:rb,list:list,extra:extra,mapItems:mapItems,numbered:(tab==='cex'&&cexView==='mine')||tab==='route',line:(tab==='cex'&&cexView==='mine')||tab==='route'};
   }
-  function renderPickup(){
-    var sum='',list='',extra='';
-    if(tab==='reports'){var dm=P.filter(function(o){return o.status==='delivered';}).reduce(function(s,o){return s+o.mesh;},0);sum=sumHtml([[dm,'сіток'],['1','курʼєр'],[dm*20,'до сплати']]);extra='<div class="cr-table"><h3>Самовивіз — оплата за сітки</h3><table><thead><tr><th>Курʼєр</th><th>Сіток</th><th>Ставка</th><th>Сума</th></tr></thead><tbody><tr><td>'+me+'</td><td>'+dm+'</td><td>20</td><td>'+dm*20+' грн</td></tr></tbody></table></div>';return {showMap:false,sum:sum,panel:'',sub:'',rb:'',list:'',extra:extra,mapItems:[]};}
-    var st=tab==='cex'?'pending':tab==='route'?'loaded':'delivered';var arr=P.filter(function(o){return o.status===st;});var lbl=tab==='cex'?'сіток у цеху':tab==='route'?'у машині':'на точках';
-    sum=sumHtml([[arr.reduce(function(s,o){return s+o.mesh;},0),lbl],[arr.length,'позицій'],['—','точок']]);
-    list=arr.length?arr.map(function(o){return '<div class="cr-order tap is-'+(o.status==='pending'?'free':o.status)+'" data-act="ptap" data-id="'+o.id+'"><span class="cr-check">'+(o.status==='delivered'?'✓':o.status==='loaded'?'🚚':'')+'</span><span class="cr-order__body"><strong>'+o.num+'</strong><small>'+o.point+' · '+o.name+'</small></span><span class="cr-mesh">'+o.mesh+' шт.</span><span></span></div>';}).join(''):'<div class="cr-empty">Порожньо</div>';
-    extra='<div class="hint">Тап: цех → у машині → доставлено.</div>';
-    return {showMap:false,sum:sum,panel:'',sub:'',rb:'',list:list,extra:extra,mapItems:[]};
-  }
 
   function render(){
-    var secL=section==='address'?'Адресна доставка':'Самовивіз';
-    var tabL={cex:section==='address'?(cexView==='mine'?'Моя карта (план)':'Спільна карта'):'Цех',route:section==='address'?'У машині':'Їде',delivered:'Доставлено',reports:'Звіти'}[tab];
-    $('#kicker').textContent=secL+' · '+tabL;
-    [].forEach.call($('#sec').children,function(b){b.classList.toggle('on',b.getAttribute('data-s')===section);});
+    var tabL={cex:cexView==='mine'?'Моя карта (план)':'Спільна карта',route:'У машині',delivered:'Доставлено',reports:'Звіти'}[tab];
+    $('#kicker').textContent='Адресна доставка · '+tabL;
     [].forEach.call($('#tabs').children,function(b){b.classList.toggle('on',b.getAttribute('data-t')===tab);});
-    var r=section==='address'?renderAddress():renderPickup();
+    var r=renderAddress();
     $('#summary').innerHTML=r.sum;$('#panel').innerHTML=r.panel;$('#subseg').innerHTML=r.sub;$('#routebar').innerHTML=r.rb;$('#list').innerHTML=r.list;$('#extra').innerHTML=r.extra;
-    if(r.showMap){$('#mapwrap').style.display='block';drawMap(r.mapItems,r.numbered,r.line,section+'/'+tab+'/'+cexView);}else $('#mapwrap').style.display='none';
-    var bc,br,bd;if(section==='address'){bc=A.filter(function(o){return o.st==='free'&&!o.planned;}).length;br=myRoute().length;bd=A.filter(function(o){return o.by===me&&o.st==='delivered';}).length;}else{bc=P.filter(function(o){return o.status==='pending';}).length;br=P.filter(function(o){return o.status==='loaded';}).length;bd=P.filter(function(o){return o.status==='delivered';}).length;}
-    setB('b-cex',bc);setB('b-route',br);setB('b-deliv',bd);
+    if(r.showMap){$('#mapwrap').style.display='block';drawMap(r.mapItems,r.numbered,r.line,tab+'/'+cexView);}else $('#mapwrap').style.display='none';
+    setB('b-cex',A.filter(function(o){return o.st==='free'&&!o.planned;}).length);setB('b-route',myRoute().length);setB('b-deliv',A.filter(function(o){return o.by===me&&o.st==='delivered';}).length);
   }
   function setB(id,n){var e=document.getElementById(id);e.textContent=n;e.style.display=n?'block':'none';}
 
-  $('#main').addEventListener('click',function(e){
-    var el=e.target.closest('[data-act]');if(!el)return;var a=el.getAttribute('data-act'),id=el.getAttribute('data-id');
-    if(a==='tap')tapAddr(A.find(function(x){return x.id===id;}));
-    else if(a==='ptap')tapPickup(P.find(function(x){return x.id===id;}));
-    else if(a==='cv'){cexView=el.getAttribute('data-v');render();}
-    else if(a==='up')reorder(id,-1);else if(a==='down')reorder(id,1);
-    else if(a==='reserve'){var ro=A.find(function(x){return x.id===id;});ro.st='reserved';ro.planned=false;toast('★ Зарезервовано');render();}
-    else if(a==='remove'){var rm=A.find(function(x){return x.id===id;});rm.st='free';rm.planned=false;rm.by=null;rm.pos=0;renumber();toast('Видалено з плану');render();}
-    else if(a==='load'){var lo=A.find(function(x){return x.id===id;});lo.st='loaded';renumber();toast('Завантажено в машину');render();}
-    else if(a==='deliver'){var dv=A.find(function(x){return x.id===id;});dv.st='delivered';renumber();toast('Доставлено ✓ — прибрано з маршруту');render();}
-    else if(a==='return'){var rt2=A.find(function(x){return x.id===id;});rt2.st='free';rt2.planned=false;rt2.by=null;rt2.pos=0;renumber();toast('Повернуто в цех');render();}
-    else if(a==='undeliver'){var ud=A.find(function(x){return x.id===id;});ud.st='loaded';renumber();toast('Повернуто в машину');render();}
-    else if(a==='release'){var re=A.find(function(x){return x.id===id;});re.st='free';re.by=null;re.pos=0;toast('Керівник звільнив резерв');render();}
-    else if(a==='pin'){var po=A.find(function(x){return x.id===id;});po.lat=50.452;po.lng=30.515;po.pinning=true;po.clean=po.clean||'Адреса (на карті)';toast('Перетягни маркер ✎');render();}
-    else if(a==='plan')aiPlan();
-    else if(a==='period'){period=el.getAttribute('data-p');render();}
-    else if(a==='confirm'){var c=el.getAttribute('data-c');A.forEach(function(o){if(o.by===c&&o.st==='delivered'&&isUs(o))o.confirmed=true;});toast('Підтверджено: '+c);render();}
-    else if(a==='pay'){var cp=el.getAttribute('data-c');A.forEach(function(o){if(o.by===cp&&o.st==='delivered'&&isUs(o)&&o.confirmed)o.paid=true;});toast('Оплачено: '+cp);render();}
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('[data-act]');
+    if(el){var a=el.getAttribute('data-act'),id=el.getAttribute('data-id');
+      if(a==='closeCard'){closeCard();return;}
+      if(a==='cv'){cexView=el.getAttribute('data-v');render();return;}
+      if(a==='up'){reorder(id,-1);return;}if(a==='down'){reorder(id,1);return;}
+      if(a==='aiplan'){aiPlan();return;}
+      if(a==='period'){period=el.getAttribute('data-p');render();return;}
+      if(a==='confirm'){var c=el.getAttribute('data-c');A.forEach(function(o){if(o.by===c&&o.st==='delivered'&&isUs(o))o.confirmed=true;});toast('Підтверджено: '+c);render();return;}
+      if(a==='pay'){var cp=el.getAttribute('data-c');A.forEach(function(o){if(o.by===cp&&o.st==='delivered'&&isUs(o)&&o.confirmed)o.paid=true;});toast('Оплачено: '+cp);render();return;}
+      if(a==='none')return;
+      doAct(a,id);return;
+    }
+    var rowEl=e.target.closest('[data-card]');if(rowEl){var o=byId(rowEl.getAttribute('data-card'));if(o.st==='reserved'&&!mine(o)&&!canManage()){toast('Зайнято: '+o.by);return;}openCard(rowEl.getAttribute('data-card'));}
   });
-  $('#main').addEventListener('input',function(e){var el=e.target;if(!el.getAttribute||el.getAttribute('data-act')!=='hours')return;hours=+el.value;var b=el.parentNode&&el.parentNode.querySelector('b');if(b)b.textContent=hours+' год';var pb=$('#panel').querySelector('[data-act=plan]');if(pb)pb.textContent='AI-план на '+hours+' год';});
+  $('#main').addEventListener('input',function(e){var el=e.target;if(!el.getAttribute||el.getAttribute('data-act')!=='hours')return;hours=+el.value;var b=el.parentNode&&el.parentNode.querySelector('b');if(b)b.textContent=hours+' год';var pb=$('#panel').querySelector('[data-act=aiplan]');if(pb)pb.textContent='AI-план на '+hours+' год';});
   $('#main').addEventListener('dragstart',function(e){var el=e.target.closest('[data-drag]');if(el){dragId=el.getAttribute('data-drag');e.dataTransfer.effectAllowed='move';}});
-  $('#main').addEventListener('dragover',function(e){var el=e.target.closest('[data-drag]');if(el){e.preventDefault();el.classList.add('drag-over');}});
-  $('#main').addEventListener('dragleave',function(e){var el=e.target.closest('[data-drag]');if(el)el.classList.remove('drag-over');});
-  $('#main').addEventListener('drop',function(e){var el=e.target.closest('[data-drag]');if(el&&dragId){e.preventDefault();dropReorder(dragId,el.getAttribute('data-drag'));dragId=null;}});
+  $('#main').addEventListener('dragover',function(e){var el=e.target.closest('[data-card]');if(el&&dragId){e.preventDefault();el.classList.add('drag-over');}});
+  $('#main').addEventListener('dragleave',function(e){var el=e.target.closest('[data-card]');if(el)el.classList.remove('drag-over');});
+  $('#main').addEventListener('drop',function(e){var el=e.target.closest('[data-card]');if(el&&dragId){e.preventDefault();dropReorder(dragId,el.getAttribute('data-card'));dragId=null;}});
   $('#me').onchange=function(e){me=e.target.value;cexView='common';renumber();render();toast('Тепер ви: '+me);};
   $('#themebtn').onclick=function(){theme=THEMES[(THEMES.indexOf(theme)+1)%3];$('#app').className='cr-app theme-'+theme;$('#themebtn').textContent=TICON[theme];setTimeout(function(){map&&map.invalidateSize();},60);};
-  [].forEach.call($('#sec').children,function(b){b.onclick=function(){section=b.getAttribute('data-s');render();};});
   [].forEach.call($('#tabs').children,function(b){b.onclick=function(){tab=b.getAttribute('data-t');render();};});
   renumber();render();
 })();
