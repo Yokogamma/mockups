@@ -55,6 +55,12 @@
 .cr-acts .g{border-color:#1a73e8;color:#1a73e8}.cr-acts .w{border-color:#19b3d6;color:#0a8bb0}.cr-acts .ok{border-color:var(--loaded);color:var(--loaded)}.cr-acts .rm{border-color:var(--danger);color:var(--danger)}
 .cr-toast{position:fixed;left:12px;right:12px;bottom:74px;max-width:496px;margin:0 auto;border-radius:10px;background:#111827;color:#fff;padding:11px 14px;text-align:center;font-size:13px;font-weight:800;opacity:0;transition:opacity .25s;pointer-events:none;z-index:60}.cr-toast.show{opacity:1}
 .lp{font-size:11px;color:var(--muted);font-weight:700}.hint{font-size:11.5px;color:var(--muted);text-align:center}.drag-over{outline:2px dashed var(--accent);outline-offset:-2px}
+.cr-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:4px}
+.cr-switch button{border:0;border-radius:7px;background:transparent;color:var(--muted);padding:10px;font-weight:800;font-size:13.5px}
+.cr-switch button.on{background:var(--accent);color:var(--accent-ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.cr-pgroup{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+.cr-phead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.cr-pgroup .cr-row{background:var(--surface-2)}
 </style>
 </head>
 <body>
@@ -62,6 +68,7 @@
   <header class="cr-topbar">
     <div class="cr-topbar__inner"><div class="cr-titleblock"><div class="cr-kicker" id="kicker"></div><h1>Розвезення</h1></div>
       <div class="cr-user"><select id="me"><option>Вася</option><option>Роман</option><option>Бухгалтер</option></select><button class="cr-themebtn" id="themebtn">☀</button></div></div>
+    <div class="cr-switch" id="switch"><button data-s="pickup">📍 Точки видачі</button><button data-s="address">🗺️ Адресна</button></div>
   </header>
   <main class="cr-main" id="main">
     <div class="cr-summary" id="summary"></div><div id="panel"></div>
@@ -92,11 +99,21 @@
     {id:'a8',code:'ДН',name:'Галина',phone:'+380500000008',clean:'вул. Лугова, 5',dist:'Оболонь',lat:50.5180,lng:30.4900,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
     {id:'a9',code:'ДН',name:'Степан Б.',phone:'+380500000009',clean:null,raw:'курʼєр уточнить (демо)',dist:'Невідомо',lat:null,lng:null,fee:null,montage:false,com:'потрібен пін',st:'free',by:null,planned:false,hidden:false,pos:0,geo:'pin',confirmed:false,paid:false},
   ];
+  // Самовивіз — замовлення по точках видачі (спрощено для демо перемикача)
+  var P=[
+    {id:'p1',point:'Щербаківського 37 «Двері»',order:'k3980',name:'Олег',phone:'+380500000011',mesh:4,com:'',st:'free',by:null},
+    {id:'p2',point:'Щербаківського 37 «Двері»',order:'*28780',name:'Артем',phone:'+380500000012',mesh:4,com:'бин, в1',st:'free',by:null},
+    {id:'p3',point:'Борщагівська 171/18 «Питна Вода»',order:'i70787',name:'Олег Денисюк',phone:'+380500000013',mesh:3,com:'',st:'loaded',by:'Вася'},
+    {id:'p4',point:'Борщагівська 171/18 «Питна Вода»',order:'i70739',name:'Вячеслав',phone:'+380500000014',mesh:2,com:'до 17:00',st:'free',by:null},
+    {id:'p5',point:'Миропільська 53-А «Юність»',order:'i70871',name:'Ніна',phone:'+380500000015',mesh:1,com:'',st:'delivered',by:'Вася'},
+    {id:'p6',point:'Миропільська 53-А «Юність»',order:'i70844',name:'Богдан',phone:'+380500000016',mesh:2,com:'',st:'free',by:null},
+  ];
   var me='Вася',section='address',tab='cex',theme='light',hours=3,period='trip',cexView='common',dragId=null,cardId=null;
   var THEMES=['light','dark','warm'],TICON={light:'☀',dark:'🌙',warm:'♨'};
   var col={free:'#4f46e5',planned:'#4f46e5',reserved:'#7c5cff',star:'#0f9f6e',lock:'#8a8f88',loaded:'#0f9f6e',delivered:'#0b86b8',depot:'#172018',out:'#c93636'};
   var distOrder=['Оболонь','Поділ',"Солом'янка",'Печерськ','Лівобережжя','приміська'];
-  var $=function(s){return document.querySelector(s);};var byId=function(id){return A.find(function(x){return x.id===id;});};
+  var $=function(s){return document.querySelector(s);};var byId=function(id){return A.concat(P).find(function(x){return x.id===id;});};
+  function isPickup(o){return o&&o.point!==undefined;}
   var map,layer,lastKey='';
   function toast(m){var t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2300);}
   function mine(o){return o.by===me;}function isUs(o){return o.code==='ДО'||o.code==='ДМО';}function canManage(){return me==='Роман'||me==='Бухгалтер';}
@@ -149,8 +166,11 @@
     h+='</div>';return h;
   }
 
-  function openCard(id){cardId=id;var o=byId(id);var h='<h2>'+(o.clean||o.raw)+'</h2><div class="ph">'+o.name+' · '+o.phone+' · '+o.dist+'</div>';
-    h+='<div class="cr-tags" style="margin-bottom:10px">'+tags(o)+'</div>';
+  function openCard(id){cardId=id;var o=byId(id);
+    var title=isPickup(o)?o.order:(o.clean||o.raw);
+    var sub=isPickup(o)?(o.point+' · '+o.name):(o.name+' · '+o.phone+' · '+o.dist);
+    var h='<h2>'+title+'</h2><div class="ph">'+sub+'</div>';
+    if(!isPickup(o))h+='<div class="cr-tags" style="margin-bottom:10px">'+tags(o)+'</div>';
     if(o.com)h+='<div class="hint" style="text-align:left;margin-bottom:10px">💬 '+o.com+'</div>';
     if(o.phone)h+='<div class="cr-contact"><a href="tel:'+o.phone+'">Дзвінок</a><a href="viber://chat?number=%2B'+o.phone.replace(/\\D/g,'')+'">Viber</a><button data-act="copy" data-id="'+o.id+'">Копія</button></div>';
     h+='<div class="cr-acts">'+cardActions(o)+'</div>';
@@ -158,6 +178,12 @@
     $('#cardSheet').innerHTML=h;$('#cardModal').style.display='flex';
   }
   function cardActions(o){var b=[];
+    if(isPickup(o)){
+      if(o.st==='free')b.push(['ploadm','🚚 Завантажити в машину','pri']);
+      else if(o.st==='loaded'){b.push(['deliver','✓ Доставлено на точку','pri ok']);b.push(['returncex','↩ Повернути в цех','rm']);}
+      else if(o.st==='delivered')b.push(['undeliver','↩ Повернути в машину','']);
+      return mk(b);
+    }
     if(o.geo==='pin'&&o.lat==null){b.push(['pin','✎ Поставити пін','pri']);return mk(b);}
     if(o.st==='free'&&!o.planned){b.push(['plan','➕ В план','pri']);b.push(['tomachine','🚚 В машину (без плану)','']);}
     else if(o.st==='free'&&o.planned){b.push(['reserve','★ В резерв','pri']);b.push([o.hidden?'show':'hide',o.hidden?'👁 Показати в маршруті':'🚫 Сховати з маршруту','']);b.push(['remove','✕ Видалити з плану','rm']);}
@@ -171,7 +197,8 @@
   function closeCard(){$('#cardModal').style.display='none';cardId=null;}
 
   function doAct(a,id){var o=byId(id);
-    if(a==='plan'){o.planned=true;o.by=me;o.pos=nextPos();toast('Додано в план');}
+    if(a==='ploadm'){o.st='loaded';o.by=me;toast('Завантажено в машину');}
+    else if(a==='plan'){o.planned=true;o.by=me;o.pos=nextPos();toast('Додано в план');}
     else if(a==='tomachine'){o.st='loaded';o.by=me;o.planned=false;o.pos=nextPos();toast('Завантажено в машину (без плану)');}
     else if(a==='reserve'){o.st='reserved';o.planned=false;toast('★ Зарезервовано');}
     else if(a==='hide'){o.hidden=true;toast('Сховано з маршруту (лишилось у плані)');}
@@ -191,6 +218,36 @@
   function dropReorder(s,t){if(s===t)return;var arr=(tab==='cex'?myPlan():myRoute());var src=arr.find(function(x){return x.id===s;});if(!src)return;arr=arr.filter(function(x){return x.id!==s;});var ti=arr.findIndex(function(x){return x.id===t;});arr.splice(ti<0?arr.length:ti,0,src);arr.forEach(function(o,i){o.pos=i+1;});render();}
   function aiPlan(){var free=A.filter(function(o){return o.st==='free'&&!o.planned&&o.lat!=null;});free.sort(function(a,b){return (a.out?1:0)-(b.out?1:0)||distOrder.indexOf(a.dist)-distOrder.indexOf(b.dist);});var cap=Math.max(1,Math.floor((hours*60-15)/25));free.slice(0,cap).forEach(function(o){o.planned=true;o.by=me;o.pos=nextPos();});renumber();cexView='mine';toast('AI: на '+hours+' год — '+Math.min(cap,free.length)+' у план');render();}
   function sumHtml(c){return c.map(function(x){return '<div><b>'+x[0]+'</b><span>'+x[1]+'</span></div>';}).join('');}
+
+  // ===== Самовивіз (точки видачі) =====
+  function pStGlyph(o){return o.st==='loaded'?'🚚':o.st==='delivered'?'✓':'';}
+  function groupPts(orders){var m={},keys=[];orders.forEach(function(o){if(!m[o.point]){m[o.point]=[];keys.push(o.point);}m[o.point].push(o);});return keys.map(function(k){return {point:k,items:m[k]};});}
+  function prow(o){return '<div class="cr-row '+stClass(o)+'" data-card="'+o.id+'"><span class="cr-st">'+pStGlyph(o)+'</span><span class="cr-body"><strong>'+o.order+'</strong><small>'+o.name+(o.by?' · '+o.by:'')+(o.com?' · '+o.com:'')+'</small></span><span class="cr-mesh">'+o.mesh+' шт.</span><span class="cr-chev">›</span></div>';}
+  function pickupGroups(orders){return groupPts(orders).map(function(g){var mesh=g.items.reduce(function(s,o){return s+o.mesh;},0);return '<div class="cr-pgroup"><div class="cr-phead"><strong>'+g.point+'</strong><span class="cr-mesh">'+g.items.length+' / '+mesh+' шт.</span></div>'+g.items.map(prow).join('')+'</div>';}).join('');}
+  function renderPickup(){
+    var sum='',list='',extra='';
+    if(tab==='cex'){
+      var free=P.filter(function(o){return o.st==='free';});
+      sum=sumHtml([[free.length,'у цеху'],[P.filter(function(o){return o.st==='loaded';}).length,'у машинах'],[groupPts(free).length,'точок']]);
+      list=free.length?pickupGroups(free):'<div class="cr-empty">Цех порожній</div>';
+      extra='<div class="hint">Тап по заказу — картка дій: «Завантажити в машину».</div>';
+    } else if(tab==='route'){
+      var rt=P.filter(function(o){return o.by===me&&o.st==='loaded';});
+      sum=sumHtml([[rt.length,'у машині'],[rt.reduce(function(s,o){return s+o.mesh;},0),'сіток'],[groupPts(rt).length,'точок']]);
+      list=rt.length?pickupGroups(rt):'<div class="cr-empty">У машині порожньо</div>';
+      extra='<div class="hint">Тап — картка: «Доставлено на точку» / «Повернути в цех».</div>';
+    } else if(tab==='delivered'){
+      var dl=P.filter(function(o){return o.by===me&&o.st==='delivered';});
+      sum=sumHtml([[dl.length,'доставлено'],[dl.reduce(function(s,o){return s+o.mesh;},0),'сіток'],[groupPts(dl).length,'точок']]);
+      list=dl.length?pickupGroups(dl):'<div class="cr-empty">Ще нічого не доставлено</div>';
+    } else {
+      var d2=P.filter(function(o){return o.st==='delivered';}),byc={},ck=[];
+      d2.forEach(function(o){var c=o.by||'?';if(!byc[c]){byc[c]={n:0,mesh:0};ck.push(c);}byc[c].n++;byc[c].mesh+=o.mesh;});
+      var rows=ck.map(function(c){var v=byc[c];return '<tr><td>'+c+'</td><td>'+v.n+'</td><td>'+v.mesh+'</td><td>'+(v.mesh*20)+' грн</td></tr>';}).join('');
+      extra='<div class="cr-table"><h3>Самовивіз — оплата курʼєрам (20 грн/сітка)</h3><table><thead><tr><th>Курʼєр</th><th>Дост.</th><th>Сіток</th><th>Сума</th></tr></thead><tbody>'+(rows||'<tr><td colspan="4" class="lp">немає</td></tr>')+'</tbody></table><div class="hint" style="margin-top:8px">Оплата за доставлені сітки (самовивіз) — окремо від адресної.</div></div>';
+    }
+    return {showMap:false,sum:sum,panel:'',sub:'',rb:'',list:list,extra:extra,mapItems:[],numbered:false,line:false};
+  }
 
   function renderAddress(){
     var showMap=false,panel='',list='',extra='',sum='',sub='',rb='';
@@ -235,13 +292,18 @@
   }
 
   function render(){
-    var tabL={cex:cexView==='mine'?'Моя карта (план)':'Спільна карта',route:'У машині',delivered:'Доставлено',reports:'Звіти'}[tab];
-    $('#kicker').textContent='Адресна доставка · '+tabL;
+    [].forEach.call($('#switch').children,function(b){b.classList.toggle('on',b.getAttribute('data-s')===section);});
+    var pickup=section==='pickup';
+    var tabL=pickup
+      ? {cex:'Цех',route:'У машині',delivered:'Доставлено',reports:'Звіти'}[tab]
+      : {cex:cexView==='mine'?'Моя карта (план)':'Спільна карта',route:'У машині',delivered:'Доставлено',reports:'Звіти'}[tab];
+    $('#kicker').textContent=(pickup?'Точки видачі':'Адресна доставка')+' · '+tabL;
     [].forEach.call($('#tabs').children,function(b){b.classList.toggle('on',b.getAttribute('data-t')===tab);});
-    var r=renderAddress();
+    var r=pickup?renderPickup():renderAddress();
     $('#summary').innerHTML=r.sum;$('#panel').innerHTML=r.panel;$('#subseg').innerHTML=r.sub;$('#routebar').innerHTML=r.rb;$('#list').innerHTML=r.list;$('#extra').innerHTML=r.extra;
     if(r.showMap){$('#mapwrap').style.display='block';drawMap(r.mapItems,r.numbered,r.line,tab+'/'+cexView);}else $('#mapwrap').style.display='none';
-    setB('b-cex',A.filter(function(o){return o.st==='free'&&!o.planned;}).length);setB('b-route',myRoute().length);setB('b-deliv',A.filter(function(o){return o.by===me&&o.st==='delivered';}).length);
+    if(pickup){setB('b-cex',P.filter(function(o){return o.st==='free';}).length);setB('b-route',P.filter(function(o){return o.by===me&&o.st==='loaded';}).length);setB('b-deliv',P.filter(function(o){return o.by===me&&o.st==='delivered';}).length);}
+    else{setB('b-cex',A.filter(function(o){return o.st==='free'&&!o.planned;}).length);setB('b-route',myRoute().length);setB('b-deliv',A.filter(function(o){return o.by===me&&o.st==='delivered';}).length);}
   }
   function setB(id,n){var e=document.getElementById(id);e.textContent=n;e.style.display=n?'block':'none';}
 
@@ -268,6 +330,7 @@
   $('#me').onchange=function(e){me=e.target.value;cexView='common';renumber();render();toast('Тепер ви: '+me);};
   $('#themebtn').onclick=function(){theme=THEMES[(THEMES.indexOf(theme)+1)%3];$('#app').className='cr-app theme-'+theme;$('#themebtn').textContent=TICON[theme];setTimeout(function(){map&&map.invalidateSize();},60);};
   [].forEach.call($('#tabs').children,function(b){b.onclick=function(){tab=b.getAttribute('data-t');render();};});
+  [].forEach.call($('#switch').children,function(b){b.onclick=function(){section=b.getAttribute('data-s');tab='cex';cexView='common';closeCard();render();};});
   renumber();render();
 })();
 </script>
