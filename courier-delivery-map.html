@@ -28,7 +28,9 @@
 .mk{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-weight:800;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .cr-routebar{display:flex;justify-content:space-around;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:14px;font-weight:800}.cr-routebar small{display:block;color:var(--muted);font-size:10.5px;font-weight:700;text-align:center}
 .cr-list{display:flex;flex-direction:column;gap:9px}
-.cr-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;cursor:pointer}
+.cr-row{position:relative;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;cursor:pointer}
+.cr-age{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0 0 8px 8px;overflow:hidden;background:var(--surface-2)}
+.cr-age i{display:block;height:100%;border-radius:0 2px 2px 0}
 .cr-row.is-reserved{background:var(--res-bg)}.cr-row.is-loaded{background:var(--loaded-bg)}.cr-row.is-delivered{background:var(--delivered-bg)}.cr-row.is-locked{opacity:.6;cursor:default}.cr-row.is-planned{border-color:var(--accent)}.cr-row.is-hidden{opacity:.5}
 .cr-st{width:30px;height:30px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:8px;color:#fff;font-size:14px;font-weight:900;background:var(--surface)}
 .is-planned .cr-st{border-color:var(--accent);background:var(--accent)}.is-reserved .cr-st{border-color:var(--res);background:var(--res)}.is-loaded .cr-st{border-color:var(--loaded);background:var(--loaded)}.is-delivered .cr-st{border-color:var(--delivered);background:var(--delivered)}.is-locked .cr-st{border-color:var(--lock);background:var(--lock-bg);color:var(--lock)}
@@ -89,15 +91,15 @@
 (function(){
   var DEPOT={lat:50.4565,lng:30.3660,name:'Депо · Здолбунівська 7Д'};
   var A=[
-    {id:'a1',code:'ДН',name:'Тарас',phone:'+380500000001',clean:'вул. Приозерна, 12, 1 під.',dist:'Оболонь',lat:50.5125,lng:30.4980,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a2',code:'ДН',name:'Оксана',phone:'+380500000002',clean:'вул. Контрактова, 4',dist:'Поділ',lat:50.4655,lng:30.5160,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a3',code:'ДМО',name:'Степан',phone:'+380500000005',clean:'вул. Квіткова, 18, кв 16',dist:"Солом'янка",lat:50.4305,lng:30.4705,fee:400,montage:true,com:'монтаж — взяти інструмент',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a4',code:'ДМН',name:'Лідія',phone:'+380500000006',clean:'вул. Садова, 3, кв 33',dist:"Солом'янка",lat:50.4280,lng:30.4640,fee:null,montage:true,com:'до 18:00',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a5',code:'ДН',name:'Богдан',phone:'+380500000003',clean:'вул. Лісова, 14, 3 під.',dist:'Печерськ',lat:50.4270,lng:30.5390,fee:null,montage:false,com:'',st:'reserved',by:'Роман',planned:false,hidden:false,pos:1,confirmed:false,paid:false},
-    {id:'a6',code:'ДН',name:'Ніна',phone:'+380500000004',clean:'вул. Ентузіастів, 11/1',dist:'Лівобережжя',lat:50.4440,lng:30.5850,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a7',code:'ДМО',name:'Юрій',phone:'+380500000007',clean:'смт Демидів (за межами Києва)',dist:'приміська',lat:50.6200,lng:30.3600,fee:1200,montage:true,com:'',st:'free',by:null,out:true,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a8',code:'ДН',name:'Галина',phone:'+380500000008',clean:'вул. Лугова, 5',dist:'Оболонь',lat:50.5180,lng:30.4900,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false},
-    {id:'a9',code:'ДН',name:'Степан Б.',phone:'+380500000009',clean:null,raw:'курʼєр уточнить (демо)',dist:'Невідомо',lat:null,lng:null,fee:null,montage:false,com:'потрібен пін',st:'free',by:null,planned:false,hidden:false,pos:0,geo:'pin',confirmed:false,paid:false},
+    {id:'a1',code:'ДН',name:'Тарас',phone:'+380500000001',clean:'вул. Приозерна, 12, 1 під.',dist:'Оболонь',lat:50.5125,lng:30.4980,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:1},
+    {id:'a2',code:'ДН',name:'Оксана',phone:'+380500000002',clean:'вул. Контрактова, 4',dist:'Поділ',lat:50.4655,lng:30.5160,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:2},
+    {id:'a3',code:'ДМО',name:'Степан',phone:'+380500000005',clean:'вул. Квіткова, 18, кв 16',dist:"Солом'янка",lat:50.4305,lng:30.4705,fee:400,montage:true,com:'монтаж — взяти інструмент',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:3},
+    {id:'a4',code:'ДМН',name:'Лідія',phone:'+380500000006',clean:'вул. Садова, 3, кв 33',dist:"Солом'янка",lat:50.4280,lng:30.4640,fee:null,montage:true,com:'до 18:00',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:4},
+    {id:'a5',code:'ДН',name:'Богдан',phone:'+380500000003',clean:'вул. Лісова, 14, 3 під.',dist:'Печерськ',lat:50.4270,lng:30.5390,fee:null,montage:false,com:'',st:'reserved',by:'Роман',planned:false,hidden:false,pos:1,confirmed:false,paid:false,made:6},
+    {id:'a6',code:'ДН',name:'Ніна',phone:'+380500000004',clean:'вул. Ентузіастів, 11/1',dist:'Лівобережжя',lat:50.4440,lng:30.5850,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:5},
+    {id:'a7',code:'ДМО',name:'Юрій',phone:'+380500000007',clean:'смт Демидів (за межами Києва)',dist:'приміська',lat:50.6200,lng:30.3600,fee:1200,montage:true,com:'',st:'free',by:null,out:true,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:9},
+    {id:'a8',code:'ДН',name:'Галина',phone:'+380500000008',clean:'вул. Лугова, 5',dist:'Оболонь',lat:50.5180,lng:30.4900,fee:null,montage:false,com:'',st:'free',by:null,planned:false,hidden:false,pos:0,confirmed:false,paid:false,made:12},
+    {id:'a9',code:'ДН',name:'Степан Б.',phone:'+380500000009',clean:null,raw:'курʼєр уточнить (демо)',dist:'Невідомо',lat:null,lng:null,fee:null,montage:false,com:'потрібен пін',st:'free',by:null,planned:false,hidden:false,pos:0,geo:'pin',confirmed:false,paid:false,made:2},
   ];
   // Самовивіз — замовлення по точках видачі (спрощено для демо перемикача)
   var P=[
@@ -153,6 +155,8 @@
   function stGlyph(o){if(o.geo==='pin'&&o.lat==null)return '✎';if(o.st==='reserved')return mine(o)?'★':'🔒';if(o.st==='loaded')return '🚚';if(o.st==='delivered')return '✓';return o.planned?'✓':'';}
   function stClass(o){if(o.st==='reserved')return mine(o)?'is-reserved':'is-locked';if(o.st==='loaded')return 'is-loaded';if(o.st==='delivered')return 'is-delivered';if(o.planned)return 'is-planned';return 'is-free';}
   function stBadge(o){if(o.st==='reserved')return mine(o)?'резерв':'зайнято';if(o.st==='loaded')return 'у машині';if(o.st==='delivered')return '✓';if(o.planned)return o.hidden?'сховано':'в плані';if(o.geo==='pin'&&o.lat==null)return 'пін';return 'вільне';}
+  // Полоса очікування в цеху: довжина ∝ днів від виготовлення (вся ширина=10 днів), колір ≤2 зел/3-4 жовт/≥5 черв. Тільки поки в цеху.
+  function ageBar(o){if(isPickup(o)||o.st==='loaded'||o.st==='delivered')return '';var d=o.made||0;var w=Math.max(8,Math.min(d/10,1)*100);var c=d<=2?'var(--loaded)':d<=4?'var(--warning)':'var(--danger)';return '<span class="cr-age" title="'+d+' дн у цеху"><i style="width:'+w+'%;background:'+c+'"></i></span>';}
 
   function row(o,opts){opts=opts||{};
     var h='<div class="cr-row '+stClass(o)+(o.hidden?' is-hidden':'')+'" data-card="'+o.id+'">';
@@ -163,7 +167,7 @@
     h+='<span class="cr-tags">'+tags(o)+'</span></span>';
     h+='<span class="cr-mesh">'+stBadge(o)+'</span>';
     h+=opts.reorder?'<span class="cr-grab" draggable="true" data-drag="'+o.id+'">⠿</span>':'<span class="cr-chev">›</span>';
-    h+='</div>';return h;
+    h+=ageBar(o);h+='</div>';return h;
   }
 
   function openCard(id){cardId=id;var o=byId(id);
@@ -261,10 +265,10 @@
         list=plan.length?plan.map(function(o){return row(o,{reorder:true,num:true});}).join(''):'<div class="cr-empty">План порожній</div>';
         extra='<div class="hint">Тап по заказу — картка дій. ⠿/▲▼ — порядок. Сховати = тимчасово прибрати з маршруту (лишається в плані).</div>';
       } else {
-        var free=A.filter(function(o){return o.st==='free'&&!o.planned;});
+        var free=A.filter(function(o){return o.st==='free'&&!o.planned&&(o.made||0)<=30;});
         sum=sumHtml([[free.length,'вільних'],[plan.length,'мій план'],[A.filter(function(o){return o.st==='reserved'&&mine(o);}).length,'резерв']]);
         panel='<div class="cr-panel"><h3>🧭 AI-планувальник виїзду з депо</h3><div class="cr-slider"><span class="lp">Бюджет</span><input type="range" data-act="hours" min="1" max="10" step="1" value="'+hours+'"><b>'+hours+' год</b></div><button class="btn pri" data-act="aiplan">AI-план на '+hours+' год</button><div class="hint">Тап по заказу — картка дій: «В план» або «В машину» (без плану).</div></div>';
-        var pool=A.filter(function(o){return o.st==='free'||o.st==='reserved';}).sort(function(a,b){var ra=a.st==='reserved'?0:a.planned?1:2,rb2=b.st==='reserved'?0:b.planned?1:2;return ra-rb2||byPos(a,b);});
+        var pool=A.filter(function(o){return o.st==='reserved'||(o.st==='free'&&(o.made||0)<=30);}).sort(function(a,b){var ra=a.st==='reserved'?0:a.planned?1:2,rb2=b.st==='reserved'?0:b.planned?1:2;return ra-rb2||byPos(a,b)||((b.made||0)-(a.made||0));});
         list=pool.length?pool.map(function(o){return row(o,{});}).join(''):'<div class="cr-empty">Пул порожній</div>';
       }
     } else if(tab==='route'){
