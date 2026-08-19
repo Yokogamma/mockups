@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Misce OneLink</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --page:#e9e8f0; --surface:#ffffff; --surface-2:#f6f5f9; --surface-3:#efeef5;
+  --ink:#211f2b; --ink-2:#5d5a6b; --ink-3:#8d8a9c;
+  --line:rgba(32,28,60,.13); --line-2:rgba(32,28,60,.24);
+  --accent:#534AB7; --on-accent:#ffffff; --accent-soft:#EEEDFB; --accent-soft-ink:#3C3489;
+  --ok-bg:#E1F5EE; --ok-ink:#0F6E56;
+  --warn-bg:#FBF1DC; --warn-ink:#7A4A08; --warn-line:rgba(170,110,20,.35);
+  --info-bg:#E6F1FB; --info-ink:#0C447C;
+  --danger-ink:#A32D2D;
+  --r-md:10px; --r-lg:16px;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#100f17; --surface:#1d1b29; --surface-2:#171522; --surface-3:#232032;
+    --ink:#efedf7; --ink-2:#a6a2b8; --ink-3:#736f86;
+    --line:rgba(255,255,255,.13); --line-2:rgba(255,255,255,.26);
+    --accent:#7c73e0; --on-accent:#ffffff; --accent-soft:#2a2648; --accent-soft-ink:#b9b3f2;
+    --ok-bg:#143229; --ok-ink:#6fd3ae;
+    --warn-bg:#322510; --warn-ink:#e8b96b; --warn-line:rgba(230,180,90,.35);
+    --info-bg:#152538; --info-ink:#85B7EB;
+    --danger-ink:#e88a8a;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#100f17; --surface:#1d1b29; --surface-2:#171522; --surface-3:#232032;
+  --ink:#efedf7; --ink-2:#a6a2b8; --ink-3:#736f86;
+  --line:rgba(255,255,255,.13); --line-2:rgba(255,255,255,.26);
+  --accent:#7c73e0; --on-accent:#ffffff; --accent-soft:#2a2648; --accent-soft-ink:#b9b3f2;
+  --ok-bg:#143229; --ok-ink:#6fd3ae;
+  --warn-bg:#322510; --warn-ink:#e8b96b; --warn-line:rgba(230,180,90,.35);
+  --info-bg:#152538; --info-ink:#85B7EB;
+  --danger-ink:#e88a8a;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:16px 10px 40px;background:var(--page);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+button{font-family:inherit}
+a{color:inherit;text-decoration:none}
+.i{width:1em;height:1em;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.13em;flex-shrink:0}
+
+/* ── рамка перегляду ── */
+.stage{max-width:400px;margin:0 auto}
+.stage-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 10px}
+.stage-title{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.view-tabs{display:flex;gap:5px}
+.vtab{font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;border:.5px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.vtab.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.addr{display:flex;align-items:center;gap:7px;background:var(--surface);border:.5px solid var(--line);border-radius:999px;padding:7px 13px;margin-bottom:10px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.addr .i{color:var(--ok-ink)}
+.screen{display:none;background:var(--surface-2);border:.5px solid var(--line);border-radius:22px;padding:12px;overflow:hidden}
+.screen.on{display:block}
+.tip{max-width:400px;margin:12px auto 0;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.5}
+
+/* ── спільні блоки ── */
+.card{background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-lg);padding:13px 14px;margin-top:9px}
+.card-h{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.bdg.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.bdg.soft{background:var(--accent-soft);color:var(--accent-soft-ink)}
+.bdg.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.mut{color:var(--ink-3);font-size:12px}
+.mono{font-family:var(--mono)}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border-radius:12px;font-size:13.5px;font-weight:700;border:.5px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.btn.ghost{border-style:dashed;color:var(--ink-2);font-weight:600}
+.brand{display:flex;align-items:center;justify-content:space-between;padding:2px 3px 0}
+.brand b{font-size:14px;font-weight:800;letter-spacing:-.01em}
+.brand b span{color:var(--accent)}
+.expire{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink-3)}
+.pagefoot{margin:14px 4px 4px;font-size:11px;color:var(--ink-3);text-align:center;line-height:1.6}
+.rowline{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:.5px solid var(--line);font-size:13px}
+.rowline:first-of-type{border-top:0}
+.svgph{display:block;width:100%;border-radius:var(--r-md);border:.5px solid var(--line)}
+.steps{margin:9px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.steps li{display:flex;gap:9px;padding:4px 0}
+.stepnum{width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent-soft-ink);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ── герой замовлення ── */
+.hero-ok{background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-lg);padding:18px 14px 15px;margin-top:9px;text-align:center}
+.hero-ok .ring{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;background:var(--ok-bg);color:var(--ok-ink);display:flex;align-items:center;justify-content:center;font-size:26px}
+.hero-ok h1{margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.hero-ok .sub{margin-top:5px;font-size:13px;color:var(--ink-2)}
+.ordno{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--mono);font-size:15px;font-weight:600;background:var(--surface-2);border:.5px dashed var(--line-2);border-radius:9px;padding:6px 13px}
+
+/* ── приватний блок ── */
+.private{background:var(--warn-bg);border:1px dashed var(--warn-line);border-radius:var(--r-lg);padding:13px 14px;margin-top:9px;color:var(--warn-ink)}
+.private .card-h{color:var(--warn-ink);margin-bottom:7px}
+.private p{margin:6px 0;font-size:13px;line-height:1.55}
+.code-chip{display:inline-flex;gap:5px;margin-top:2px}
+.code-chip b{font-family:var(--mono);font-size:16px;background:var(--surface);color:var(--ink);border-radius:7px;padding:4px 9px;border:.5px solid var(--line-2)}
+
+/* ── бронювання ── */
+.bk-photo{position:relative;border-radius:var(--r-lg);overflow:hidden;margin-top:9px;border:.5px solid var(--line)}
+.bk-photo svg{display:block;width:100%}
+.bk-cap{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;background:linear-gradient(transparent,rgba(12,10,26,.78));color:#fff}
+.bk-cap h1{margin:4px 0 2px;font-size:19px;font-weight:800;letter-spacing:-.01em}
+.bk-cap .where{font-size:12.5px;opacity:.85}
+.dates{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-top:2px}
+.date-cell .lbl{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.date-cell .d{font-size:17px;font-weight:800;margin-top:2px}
+.date-cell .t{font-size:12px;color:var(--ink-2);margin-top:1px}
+.nights{font-size:11px;font-weight:700;color:var(--accent-soft-ink);background:var(--accent-soft);border-radius:999px;padding:4px 9px;text-align:center}
+
+/* ── конструктор ── */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px;border:.5px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.chip.on{background:var(--accent);border-color:transparent;color:var(--on-accent)}
+.blk{display:flex;align-items:center;gap:9px;padding:10px 2px;border-top:.5px solid var(--line);font-size:13.5px;font-weight:600}
+.blk:first-child{border-top:0}
+.blk .grip{color:var(--ink-3);font-size:15px;cursor:grab}
+.blk .bname{flex:1;display:flex;align-items:center;gap:7px}
+.blk .bname .i{color:var(--ink-3);font-size:15px}
+.blk.off .bname{color:var(--ink-3);font-weight:500}
+.sw{width:38px;height:22px;border-radius:999px;background:var(--surface-3);border:.5px solid var(--line-2);position:relative;cursor:pointer;flex-shrink:0;padding:0}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);border:.5px solid var(--line-2);transition:transform .15s}
+.sw.on{background:var(--accent);border-color:transparent}
+.sw.on::after{transform:translateX(16px);border-color:transparent}
+.result{display:none;margin-top:9px;background:var(--accent-soft);border-radius:var(--r-lg);padding:14px;text-align:center;color:var(--accent-soft-ink)}
+.result.show{display:block}
+.result .lnk{font-family:var(--mono);font-size:17px;font-weight:700;background:var(--surface);color:var(--ink);border-radius:10px;padding:9px 12px;display:inline-block;margin:8px 0 10px}
+.qr{margin:0 auto 4px;display:block;border-radius:8px;background:#fff;padding:6px}
+
+/* деактивований стан */
+.dead{display:none;text-align:center;padding:44px 16px}
+.dead .ring{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:var(--surface-3);color:var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:28px}
+.dead h2{margin:0;font-size:17px;font-weight:800}
+.dead p{font-size:13px;color:var(--ink-2);line-height:1.55}
+.screen.used .alive{display:none}
+.screen.used .dead{display:block}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></symbol>
+<symbol id="i-pkg" viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12L4 7.5M12 12v9"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 1 1 8 0v3"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.5 15.4c1.7.7 2.8 2.3 3.1 4.6"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8 19h6a3.5 3.5 0 0 0 0-7H10a3.5 3.5 0 0 1 0-7h5.5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 4 3h9A1.5 1.5 0 0 1 14.5 4.5V5"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-3-8-8-3z"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7l1.5-3h3L15 7"/><circle cx="12" cy="13" r="3.5"/></symbol>
+<symbol id="i-linkoff" viewBox="0 0 24 24"><path d="M9 15l6-6M8 5l1-1a5 5 0 0 1 7 7l-1 1M5 8l-1 1a5 5 0 0 0 7 7l1-1"/><path d="M3 3l18 18"/></symbol>
+<symbol id="i-grip" viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h14"/></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></symbol>
+<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M4 4l16 16M10 5.3A9.6 9.6 0 0 1 12 5c5 0 9 4.5 9.5 7-.2.9-1 2.3-2.3 3.6M6.6 6.7C4.5 8 3 10 2.5 12 3 14.5 7 19 12 19c1.4 0 2.7-.3 3.9-.9"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M4 10a12 12 0 0 1 16 0M7 13.5a7.5 7.5 0 0 1 10 0M10 17a3.5 3.5 0 0 1 4 0"/><circle cx="12" cy="19.5" r=".8"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M17 5l2.5 2.5M14.5 7.5L17 10"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></symbol>
+<symbol id="i-lockw" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 1 1 8 0V10"/><circle cx="12" cy="15" r="1.4"/></symbol>
+</defs></svg>
+
+<div class="stage">
+  <div class="stage-head">
+    <span class="stage-title">misce.top · OneLink</span>
+    <div class="view-tabs">
+      <button class="vtab on" data-v="order">Замовлення</button>
+      <button class="vtab" data-v="book">Бронювання</button>
+      <button class="vtab" data-v="admin">Конструктор</button>
+    </div>
+  </div>
+
+  <div class="addr"><svg class="i"><use href="#i-lockw"/></svg><span id="addr-url">misce.top/AB3K9F</span></div>
+
+  <!-- ═══════════ ЕКРАН 1: ОТРИМАННЯ ЗАМОВЛЕННЯ ═══════════ -->
+  <div class="screen on" id="v-order">
+    <div class="alive">
+      <div class="brand">
+        <b>misce<span>·</span>top</b>
+        <span class="expire"><svg class="i"><use href="#i-timer"/></svg>діє до 02.09.2026</span>
+      </div>
+
+      <div class="hero-ok">
+        <div class="ring"><svg class="i"><use href="#i-check"/></svg></div>
+        <h1>Замовлення готове до видачі</h1>
+        <div class="sub">Доброго дня, Андрію! Ваші москітні сітки чекають на вас.</div>
+        <span class="ordno"><svg class="i"><use href="#i-pkg"/></svg>№ 1247</span>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><svg class="i"><use href="#i-pkg"/></svg>Склад замовлення · 3 сітки</div>
+        <div class="rowline"><span>Сітка рамкова, біла<br><span class="mut mono">1120 × 540 мм</span></span><b>× 2</b></div>
+        <div class="rowline"><span>Сітка дверна, антрацит<br><span class="mut mono">2050 × 680 мм</span></span><b>× 1</b></div>
+        <div class="rowline"><span class="mut">Разом</span><span style="display:flex;gap:8px;align-items:center"><b>2 940 грн</b><span class="bdg ok"><svg class="i"><use href="#i-check"/></svg>оплачено</span></span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><svg class="i"><use href="#i-pin"/></svg>Точка видачі</div>
+        <!-- «фото» точки видачі (демо-ілюстрація) -->
+        <svg class="svgph" viewBox="0 0 360 140" role="img" aria-label="Фото точки видачі (демо)">
+          <rect width="360" height="140" fill="#cdd6e0"/>
+          <rect y="96" width="360" height="44" fill="#9aa7b4"/>
+          <rect x="34" y="30" width="180" height="70" fill="#e8eaee"/><rect x="34" y="30" width="180" height="12" fill="#534AB7"/>
+          <rect x="52" y="56" width="34" height="44" fill="#6d7684"/><rect x="104" y="56" width="30" height="26" fill="#b9c2cc"/><rect x="150" y="56" width="30" height="26" fill="#b9c2cc"/>
+          <rect x="238" y="52" width="88" height="48" fill="#7f8a97"/><rect x="244" y="58" width="76" height="36" fill="#a9b3be"/>
+          <text x="124" y="24" font-family="system-ui" font-size="11" font-weight="700" fill="#3C3489" text-anchor="middle">ЦЕХ · ВИДАЧА</text>
+          <circle cx="316" cy="20" r="9" fill="#f4c95d"/>
+          <text x="180" y="130" font-family="system-ui" font-size="9" fill="#5a6470" text-anchor="middle">фото точки видачі · демо</text>
+        </svg>
+        <div class="rowline"><span><b>Цех misce.top</b><br><span class="mut">вул. Здолбунівська, 7Д, Київ</span></span><span class="bdg ok">зараз відчинено</span></div>
+        <div class="rowline"><span class="mut"><svg class="i"><use href="#i-clock"/></svg> Пн–Пт</span><b>9:00 – 18:00</b></div>
+        <div class="rowline"><span class="mut"><svg class="i"><use href="#i-clock"/></svg> Сб</span><b>10:00 – 14:00</b></div>
+        <div class="rowline"><span class="mut"><svg class="i"><use href="#i-clock"/></svg> Нд</span><span class="mut">вихідний</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><svg class="i"><use href="#i-route"/></svg>Як пройти</div>
+        <!-- схематична карта проходу -->
+        <svg class="svgph" viewBox="0 0 360 150" role="img" aria-label="Схема проходу до точки видачі">
+          <rect width="360" height="150" fill="#e9eef2"/>
+          <rect x="0" y="62" width="360" height="26" fill="#f8fafc"/><rect x="150" y="0" width="24" height="150" fill="#f8fafc"/>
+          <text x="8" y="58" font-family="system-ui" font-size="9" fill="#7c8794">вул. Здолбунівська</text>
+          <rect x="24" y="16" width="80" height="34" rx="3" fill="#d3dae2"/><rect x="210" y="14" width="120" height="36" rx="3" fill="#d3dae2"/>
+          <rect x="196" y="100" width="130" height="40" rx="3" fill="#c9c5ec"/>
+          <text x="261" y="123" font-family="system-ui" font-size="10" font-weight="700" fill="#3C3489" text-anchor="middle">Цех · 7Д</text>
+          <circle cx="46" cy="118" r="12" fill="#D4453C"/><text x="46" y="122" font-family="system-ui" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">М</text>
+          <text x="46" y="142" font-family="system-ui" font-size="9" fill="#5a6470" text-anchor="middle">Осокорки</text>
+          <path d="M60 118 H120 Q136 118 140 106 L156 78 H196 V112" fill="none" stroke="#534AB7" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round"/>
+          <circle cx="252" cy="88" r="10" fill="#534AB7"/><path d="M252 83v6M249 86h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <text x="272" y="92" font-family="system-ui" font-size="9" fill="#3C3489">вхід</text>
+        </svg>
+        <ol class="steps">
+          <li><span class="stepnum">1</span>Від метро «Осокорки» — 8 хв пішки вздовж Здолбунівської.</li>
+          <li><span class="stepnum">2</span>За синьою брамою будинку 7Д поверніть праворуч.</li>
+          <li><span class="stepnum">3</span>Вхід «Видача» — двері з фіолетовою табличкою misce.top.</li>
+        </ol>
+      </div>
+
+      <div class="private">
+        <div class="card-h"><svg class="i"><use href="#i-lock"/></svg>Видача поза графіком · лише для вас</div>
+        <p>Ми залишили ваш пакунок за хвірткою <b>праворуч від входу, у сірій шафі №2</b>. Наберіть код на замку:</p>
+        <span class="code-chip"><b>4</b><b>2</b><b>7</b></span>
+        <svg class="svgph" style="margin-top:10px" viewBox="0 0 360 110" role="img" aria-label="Фото місця, де залишено пакунок (демо)">
+          <rect width="360" height="110" fill="#d8d2c2"/><rect y="80" width="360" height="30" fill="#b3ab97"/>
+          <rect x="40" y="18" width="90" height="66" fill="#8b93a0"/><rect x="47" y="25" width="76" height="24" fill="#a5adba"/><rect x="47" y="53" width="76" height="24" fill="#a5adba"/>
+          <circle cx="115" cy="65" r="4" fill="#3f4650"/>
+          <path d="M150 84 L210 84 210 20 150 20 Z" fill="#c8bfa8"/><path d="M162 84V20M174 84V20M186 84V20M198 84V20" stroke="#a99f86" stroke-width="3"/>
+          <text x="85" y="100" font-family="system-ui" font-size="9" fill="#6b6350" text-anchor="middle">шафа №2 · демо-фото</text>
+          <circle cx="85" cy="40" r="14" fill="none" stroke="#B5432B" stroke-width="3"/>
+        </svg>
+        <p style="margin-bottom:0"><svg class="i"><use href="#i-eyeoff"/></svg> Цю інформацію видно лише за вашим особистим посиланням. Нікому його не пересилайте.</p>
+      </div>
+
+      <div class="btnrow">
+        <a class="btn pri" href="https://maps.google.com/?q=50.397,30.635" target="_blank" rel="noopener"><svg class="i"><use href="#i-route"/></svg>Маршрут</a>
+        <a class="btn" href="tel:+380500000009"><svg class="i"><use href="#i-phone"/></svg>Подзвонити</a>
+      </div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn ghost" id="btn-picked"><svg class="i"><use href="#i-check"/></svg>Я забрав(ла) замовлення — деактивувати сторінку</button>
+      </div>
+
+      <div class="pagefoot">Одноразова сторінка misce.top · самознищиться 02.09.2026<br>або одразу після підтвердження отримання</div>
+    </div>
+
+    <div class="dead">
+      <div class="ring"><svg class="i"><use href="#i-linkoff"/></svg></div>
+      <h2>Посилання використано</h2>
+      <p>Замовлення №1247 отримано. Сторінку та всі особисті дані з неї видалено.<br>Дякуємо, що обрали misce.top!</p>
+      <button class="btn ghost" id="btn-undo" style="max-width:220px;margin:8px auto 0">Повернути (демо)</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ ЕКРАН 2: КАРТКА БРОНЮВАННЯ ═══════════ -->
+  <div class="screen" id="v-book">
+    <div class="brand">
+      <b>Садиба «Гірська»</b>
+      <span class="expire"><svg class="i"><use href="#i-timer"/></svg>діє до 17.09.2026</span>
+    </div>
+
+    <div class="bk-photo">
+      <!-- «фото» будиночка (демо-ілюстрація) -->
+      <svg viewBox="0 0 360 190" role="img" aria-label="Фото будиночка №2 (демо)">
+        <rect width="360" height="190" fill="#bcd3e6"/>
+        <path d="M0 128 L70 62 130 118 190 52 258 122 320 70 360 112 V190 H0 Z" fill="#8fa8bf"/>
+        <path d="M0 150 L90 96 180 148 270 92 360 140 V190 H0 Z" fill="#5d7d68"/>
+        <rect y="158" width="360" height="32" fill="#41604c"/>
+        <path d="M118 132 L180 88 242 132 Z" fill="#7a4f31"/>
+        <rect x="130" y="132" width="100" height="44" fill="#9c6a44"/>
+        <rect x="146" y="146" width="22" height="30" fill="#5c3b22"/><rect x="186" y="146" width="26" height="18" fill="#f4e9c8"/>
+        <circle cx="312" cy="34" r="14" fill="#f7f0da"/>
+        <path d="M60 176c10-3 22-3 32 0M270 176c10-3 22-3 32 0" stroke="#2f4a3a" stroke-width="3" fill="none"/>
+        <text x="180" y="185" font-family="system-ui" font-size="8.5" fill="#d7e4d0" text-anchor="middle">фото будиночка · демо</text>
+      </svg>
+      <div class="bk-cap">
+        <span class="bdg ok"><svg class="i"><use href="#i-check"/></svg>Бронювання підтверджено</span>
+        <h1>Будиночок №2 «З видом на гори»</h1>
+        <div class="where"><svg class="i"><use href="#i-pin"/></svg> Карпати, с. Микуличин · бронь <span class="mono">№ B-0512</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="dates">
+        <div class="date-cell"><div class="lbl">Заїзд</div><div class="d">Пт, 12.09</div><div class="t">після 14:00</div></div>
+        <div class="nights">2 ночі</div>
+        <div class="date-cell" style="text-align:right"><div class="lbl">Виїзд</div><div class="d">Нд, 14.09</div><div class="t">до 12:00</div></div>
+      </div>
+      <div class="rowline" style="margin-top:8px"><span class="mut"><svg class="i"><use href="#i-users"/></svg> Гості</span><b>2 дорослих · 2 дітей</b></div>
+      <div class="rowline"><span class="mut">Вартість</span><b>5 600 грн</b></div>
+      <div class="rowline"><span class="mut">Передоплата</span><span style="display:flex;gap:8px;align-items:center"><b>1 500 грн</b><span class="bdg ok"><svg class="i"><use href="#i-check"/></svg>сплачено</span></span></div>
+      <div class="rowline"><span class="mut">Решта при заселенні</span><b>4 100 грн</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-route"/></svg>Як доїхати</div>
+      <svg class="svgph" viewBox="0 0 360 140" role="img" aria-label="Схема проїзду до садиби">
+        <rect width="360" height="140" fill="#e7efe7"/>
+        <path d="M0 96 C80 96 110 40 200 40 C260 40 280 20 360 20" fill="none" stroke="#f8fafc" stroke-width="16"/>
+        <path d="M0 96 C80 96 110 40 200 40 C260 40 280 20 360 20" fill="none" stroke="#cfd8cf" stroke-width="1"/>
+        <text x="12" y="116" font-family="system-ui" font-size="9" fill="#5a6b5a">траса Н-09 · з Яремче</text>
+        <path d="M196 44 Q214 66 204 84 Q196 100 224 112" fill="none" stroke="#534AB7" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round"/>
+        <rect x="224" y="104" width="76" height="26" rx="3" fill="#c9c5ec"/>
+        <text x="262" y="121" font-family="system-ui" font-size="9.5" font-weight="700" fill="#3C3489" text-anchor="middle">Садиба · №2</text>
+        <path d="M186 30 l10 16 h-20 z" fill="#3f7a52"/><path d="M206 26 l9 14 h-18 z" fill="#568c66"/>
+        <circle cx="196" cy="42" r="7" fill="#B5432B"/><text x="196" y="45.5" font-family="system-ui" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">!</text>
+        <text x="150" y="24" font-family="system-ui" font-size="9" fill="#5a6b5a">поворот за вказівником «Садиба Гірська»</text>
+      </svg>
+      <ol class="steps">
+        <li><span class="stepnum">1</span>З траси Н-09 — поворот за коричневим вказівником «Садиба Гірська».</li>
+        <li><span class="stepnum">2</span>1,2 км ґрунтової дороги — проїзна для будь-якого авто.</li>
+        <li><span class="stepnum">3</span>Парковка біля reception. Підійдіть — вас зустріне адміністратор.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-phone"/></svg>Контакти</div>
+      <div class="rowline"><span><b>Оксана</b><br><span class="mut">адміністраторка · reception 8:00–22:00</span></span><a class="bdg soft mono" href="tel:+380500000008">+38 050 000 00 08</a></div>
+      <div class="rowline"><span class="mut">Скажіть на reception</span><b>«Бронь B-0512, будиночок №2»</b></div>
+    </div>
+
+    <div class="private">
+      <div class="card-h"><svg class="i"><use href="#i-lock"/></svg>Для гостей · лише за цим посиланням</div>
+      <p><svg class="i"><use href="#i-wifi"/></svg> Wi-Fi: <b class="mono">Hory_2</b> · пароль <b class="mono">vesna2026</b></p>
+      <p><svg class="i"><use href="#i-key"/></svg> Пізній заїзд після 22:00: ключ у скриньці біля дверей, код <b class="mono">15-07</b>. Попередьте Оксану заздалегідь.</p>
+    </div>
+
+    <div class="btnrow">
+      <a class="btn pri" href="https://maps.google.com/?q=48.404,24.579" target="_blank" rel="noopener"><svg class="i"><use href="#i-route"/></svg>Маршрут</a>
+      <a class="btn" href="tel:+380500000008"><svg class="i"><use href="#i-phone"/></svg>Подзвонити</a>
+    </div>
+
+    <div class="pagefoot">Персональна сторінка бронювання · створено через misce.top OneLink<br>самознищиться 17.09.2026</div>
+  </div>
+
+  <!-- ═══════════ ЕКРАН 3: КОНСТРУКТОР (АДМІНКА) ═══════════ -->
+  <div class="screen" id="v-admin">
+    <div class="brand">
+      <b>Нова сторінка</b>
+      <span class="expire"><svg class="i"><use href="#i-shield"/></svg>адмінка</span>
+    </div>
+
+    <div class="card">
+      <div class="card-h">1 · Шаблон</div>
+      <div class="chips" data-group="tpl">
+        <button class="chip on">Видача замовлення</button>
+        <button class="chip">Бронювання</button>
+        <button class="chip">Порожня</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">2 · Блоки сторінки <span class="mut" style="text-transform:none;letter-spacing:0;font-weight:500">· перетягніть, щоб змінити порядок</span></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-check"/></svg>Статус і номер замовлення</span><button class="sw on" aria-label="увімкнено"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-pkg"/></svg>Склад замовлення</span><button class="sw on"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-pin"/></svg>Точка видачі + графік</span><button class="sw on"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-route"/></svg>Карта · як пройти</span><button class="sw on"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-cam"/></svg>Фото точки / обʼєкта</span><button class="sw on"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname" style="color:var(--warn-ink)"><svg class="i"><use href="#i-lock"/></svg>Приватний блок (код, схованка)</span><button class="sw on"></button></div>
+      <div class="blk"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-phone"/></svg>Кнопки: маршрут, дзвінок</span><button class="sw on"></button></div>
+      <div class="blk off"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-cal"/></svg>Дати заїзду / виїзду</span><button class="sw"></button></div>
+      <div class="blk off"><svg class="i grip"><use href="#i-grip"/></svg><span class="bname"><svg class="i"><use href="#i-chat"/></svg>Форма зворотного звʼязку</span><button class="sw"></button></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">3 · Термін дії</div>
+      <div class="chips" data-group="ttl">
+        <button class="chip">3 дні</button>
+        <button class="chip on">2 тижні</button>
+        <button class="chip">1 місяць</button>
+        <button class="chip">Своя дата…</button>
+      </div>
+      <div class="blk" style="margin-top:6px;border-top:.5px solid var(--line);padding-top:12px"><span class="bname"><svg class="i"><use href="#i-linkoff"/></svg>Видалити одразу після підтвердження «Я забрав»</span><button class="sw on"></button></div>
+      <div class="blk off" style="padding-bottom:2px"><span class="bname"><svg class="i"><use href="#i-eyeoff"/></svg>Додатковий PIN-код для відкриття сторінки</span><button class="sw"></button></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn pri" id="btn-create"><svg class="i"><use href="#i-send"/></svg>Створити посилання</button>
+    </div>
+
+    <div class="result" id="create-result">
+      <div style="font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase">Посилання готове</div>
+      <div class="lnk">misce.top/AB3K9F</div>
+      <svg class="qr" width="92" height="92" viewBox="0 0 29 29" role="img" aria-label="QR-код (демо)">
+        <rect width="29" height="29" fill="#fff"/>
+        <path fill="#1a1a1a" d="M2 2h7v7H2zM20 2h7v7h-7zM2 20h7v7H2zM4 4h3v3H4zM22 4h3v3h-3zM4 22h3v3H4zM11 2h2v2h-2zM15 3h2v3h-2zM11 6h3v2h-3zM16 7h2v2h-2zM2 11h2v2H2zM6 12h3v2H6zM11 11h2v3h2v2h-3v2h-2zM16 12h3v2h2v-2h2v3h-3v2h-2v-2h-2zM24 12h3v2h-3zM11 17h2v2h-2zM20 17h2v2h2v2h-2v2h-3v-3h1zM11 21h3v2h-3zM15 20h2v3h-2zM24 20h3v2h-3zM11 25h2v2h-2zM15 25h4v2h-4zM24 24h3v3h-3z"/>
+      </svg>
+      <div style="font-size:12px;line-height:1.5;margin-bottom:10px">6 символів · не індексується пошуковиками<br>самознищиться 02.09.2026 або після підтвердження</div>
+      <div class="btnrow" style="margin-top:0">
+        <button class="btn"><svg class="i"><use href="#i-copy"/></svg>Копіювати</button>
+        <button class="btn"><svg class="i"><use href="#i-send"/></svg>У Viber / SMS</button>
+      </div>
+    </div>
+
+    <div class="pagefoot">Конструктор misce.top OneLink · блоки збираються під будь-який сценарій:<br>видача, бронювання, оренда, запис на сервіс</div>
+  </div>
+
+  <div class="tip">Демо-дані (вигадані). Перемикайте вкладки вгорі: сторінка клієнта «Замовлення», картка «Бронювання» та «Конструктор» в адмінці. На сторінці замовлення натисніть «Я забрав» — посилання деактивується.</div>
+</div>
+
+<script>
+(function(){
+  var urls={order:"misce.top/AB3K9F",book:"misce.top/K7P2QX",admin:"admin.misce.top/new"};
+  var tabs=document.querySelectorAll(".vtab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("on")});
+      t.classList.add("on");
+      document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on")});
+      document.getElementById("v-"+t.dataset.v).classList.add("on");
+      document.getElementById("addr-url").textContent=urls[t.dataset.v];
+      window.scrollTo({top:0});
+    });
+  });
+  document.getElementById("btn-picked").addEventListener("click",function(){
+    document.getElementById("v-order").classList.add("used");window.scrollTo({top:0});
+  });
+  document.getElementById("btn-undo").addEventListener("click",function(){
+    document.getElementById("v-order").classList.remove("used");
+  });
+  document.querySelectorAll(".sw").forEach(function(sw){
+    sw.addEventListener("click",function(){
+      sw.classList.toggle("on");
+      var blk=sw.closest(".blk");if(blk)blk.classList.toggle("off",!sw.classList.contains("on"));
+    });
+  });
+  document.querySelectorAll(".chips").forEach(function(g){
+    g.querySelectorAll(".chip").forEach(function(c){
+      c.addEventListener("click",function(){
+        g.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on")});
+        c.classList.add("on");
+      });
+    });
+  });
+  document.getElementById("btn-create").addEventListener("click",function(){
+    var r=document.getElementById("create-result");
+    r.classList.add("show");r.scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+})();
+</script>
+</body>
+</html>
