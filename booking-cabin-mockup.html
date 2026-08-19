@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Садиба Гірська · Бронь</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,600&display=swap">
+<style>
+/* світла тема — свідомо єдина; палітра «гірської садиби» */
+:root{
+  --page:#f0ede4; --surface:#ffffff; --surface-2:#f8f6ef; --surface-3:#efece1;
+  --ink:#28251c; --ink-2:#635e4e; --ink-3:#96907c;
+  --line:rgba(70,60,30,.14); --line-2:rgba(70,60,30,.26);
+  --accent:#3E6B4E; --on-accent:#ffffff; --accent-soft:#E4EFE6; --accent-soft-ink:#2C5039;
+  --ok-bg:#E1F5EE; --ok-ink:#0F6E56;
+  --warn-bg:#FBF1DC; --warn-ink:#7A4A08; --warn-line:rgba(170,110,20,.35);
+  --gift-bg:#FBF4E2; --gift-ink:#8A5E14; --gift-line:rgba(176,125,43,.45);
+  --r-md:10px; --r-lg:16px;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --display:"Playfair Display",Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,SFMono-Regular,"Cascadia Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;padding:16px 10px 40px;background:var(--page);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+button{font-family:inherit}
+a{color:inherit;text-decoration:none}
+.i{width:1em;height:1em;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.13em;flex-shrink:0}
+.stage{max-width:400px;margin:0 auto}
+.addr{display:flex;align-items:center;gap:7px;background:var(--surface);border:.5px solid var(--line);border-radius:999px;padding:7px 13px;margin-bottom:10px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.addr .i{color:var(--ok-ink)}
+.screen{background:var(--surface-2);border:.5px solid var(--line);border-radius:22px;padding:12px;overflow:hidden}
+.tip{max-width:400px;margin:12px auto 0;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.5}
+.card{background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-lg);padding:13px 14px;margin-top:9px}
+.card-h{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.bdg.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.bdg.soft{background:var(--accent-soft);color:var(--accent-soft-ink)}
+.mut{color:var(--ink-3);font-size:12px}
+.mono{font-family:var(--mono)}
+.btnrow{display:flex;gap:8px;margin-top:10px}
+.btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border-radius:12px;font-size:13.5px;font-weight:700;border:.5px solid var(--line-2);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.brand{display:flex;align-items:center;justify-content:space-between;padding:2px 3px 0}
+.brand b{font-family:var(--display);font-size:15.5px;font-weight:600;letter-spacing:.01em}
+.expire{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink-3)}
+.pagefoot{margin:14px 4px 4px;font-size:11px;color:var(--ink-3);text-align:center;line-height:1.6}
+.rowline{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:.5px solid var(--line);font-size:13px}
+.rowline:first-of-type{border-top:0}
+.svgph{display:block;width:100%;border-radius:var(--r-md);border:.5px solid var(--line)}
+.steps{margin:9px 0 0;padding:0;list-style:none;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.steps li{display:flex;gap:9px;padding:4px 0}
+.stepnum{width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent-soft-ink);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* герой-«фото» */
+.bk-photo{position:relative;border-radius:var(--r-lg);overflow:hidden;margin-top:9px;border:.5px solid var(--line)}
+.bk-photo svg{display:block;width:100%}
+.bk-cap{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 12px;background:linear-gradient(transparent,rgba(22,18,8,.8));color:#fff}
+.bk-cap h1{margin:4px 0 2px;font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:.01em}
+.bk-cap .where{font-size:12.5px;opacity:.88}
+.badge-row{display:flex}
+.badge-row .bdg{flex:0 0 auto}
+
+/* особиста фраза */
+.phrase{margin-top:9px;background:var(--surface);border:.5px solid var(--line);border-radius:var(--r-lg);padding:20px 18px 17px;text-align:center}
+.phrase .leaf{color:var(--accent);font-size:17px;margin-bottom:6px}
+.phrase h2{margin:0;font-family:var(--display);font-style:italic;font-weight:500;font-size:23px;line-height:1.25;color:var(--accent-soft-ink);text-wrap:balance}
+.phrase p{margin:9px auto 0;max-width:30ch;font-size:13px;line-height:1.6;color:var(--ink-2)}
+
+/* дати */
+.dates{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-top:2px}
+.date-cell .lbl{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.date-cell .d{font-size:17px;font-weight:800;margin-top:2px}
+.date-cell .t{font-size:12px;color:var(--ink-2);margin-top:1px}
+.nights{font-size:11px;font-weight:700;color:var(--accent-soft-ink);background:var(--accent-soft);border-radius:999px;padding:4px 9px;text-align:center}
+
+/* смуга днів відпочинку */
+.stay{display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--line)}
+.day{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:46px}
+.day .dow{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.day .num{width:36px;height:36px;border-radius:50%;background:var(--surface-2);border:.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:800}
+.day.edge .num{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.day .tag{font-size:9.5px;font-weight:700;color:var(--accent-soft-ink)}
+.night{display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--accent-soft-ink);margin-top:16px}
+.night .i{font-size:15px}
+.night b{font-size:9px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+.stay-sum{margin-top:8px;text-align:center;font-size:12px;font-weight:700;color:var(--accent-soft-ink)}
+
+/* відгук */
+.stars{display:flex;gap:8px;justify-content:center;margin:6px 0 10px}
+.star{background:none;border:0;padding:2px;cursor:pointer;color:var(--line-2);font-size:27px;line-height:1}
+.star.on{color:#DFA018}
+.istar{width:1em;height:1em;fill:currentColor;stroke:none;display:block}
+.rev-txt{text-align:center;font-size:13px;color:var(--ink-2);line-height:1.55;margin:0 0 4px}
+.rev-done{display:none;text-align:center;padding:6px 0 2px}
+.rev-done .bigstar{color:#DFA018;font-size:30px}
+.rev-done p{margin:6px 0 0;font-size:13px;color:var(--ink-2);line-height:1.5}
+.rev-card.done .rev-live{display:none}
+.rev-card.done .rev-done{display:block}
+
+/* міні-галерея */
+.gal{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -2px;scrollbar-width:thin}
+.gal figure{margin:0;flex:0 0 138px}
+.gal svg{display:block;width:138px;height:96px;border-radius:9px;border:.5px solid var(--line)}
+.gal figcaption{font-size:11px;font-weight:600;color:var(--ink-2);margin-top:4px;text-align:center}
+
+/* додаткові послуги */
+.srv{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:.5px solid var(--line)}
+.srv:first-of-type{border-top:0}
+.srv .ic{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent-soft-ink);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.srv .nm{flex:1;font-size:13px;font-weight:700;line-height:1.3}
+.srv .nm .mut{display:block;font-weight:500}
+.addbtn{font-size:11.5px;font-weight:700;padding:6px 11px;border-radius:999px;border:.5px solid var(--line-2);background:var(--surface);color:var(--accent-soft-ink);cursor:pointer;white-space:nowrap}
+.addbtn.on{background:var(--accent);color:var(--on-accent);border-color:transparent}
+
+/* презент */
+.gift{margin-top:9px;background:var(--gift-bg);border:1px dashed var(--gift-line);border-radius:var(--r-lg);padding:15px 16px;color:var(--gift-ink);display:flex;gap:12px;align-items:flex-start}
+.gift .ic{width:40px;height:40px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;border:.5px solid var(--gift-line)}
+.gift h3{margin:0 0 3px;font-family:var(--display);font-size:15.5px;font-weight:600}
+.gift p{margin:0;font-size:13px;line-height:1.55}
+.gift .word{font-family:var(--mono);font-weight:600;background:var(--surface);border-radius:6px;padding:1px 7px;border:.5px solid var(--gift-line)}
+
+/* приватний блок */
+.private{background:var(--warn-bg);border:1px dashed var(--warn-line);border-radius:var(--r-lg);padding:13px 14px;margin-top:9px;color:var(--warn-ink)}
+.private .card-h{color:var(--warn-ink);margin-bottom:7px}
+.private p{margin:6px 0;font-size:13px;line-height:1.55}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4 10-11"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 1 1 8 0v3"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M16 5.4a3.2 3.2 0 0 1 0 5.9M17.5 15.4c1.7.7 2.8 2.3 3.1 4.6"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.4"/><circle cx="18" cy="5" r="2.4"/><path d="M8 19h6a3.5 3.5 0 0 0 0-7H10a3.5 3.5 0 0 1 0-7h5.5"/></symbol>
+<symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M4 10a12 12 0 0 1 16 0M7 13.5a7.5 7.5 0 0 1 10 0M10 17a3.5 3.5 0 0 1 4 0"/><circle cx="12" cy="19.5" r=".8"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M17 5l2.5 2.5M14.5 7.5L17 10"/></symbol>
+<symbol id="i-lockw" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 1 1 8 0V10"/><circle cx="12" cy="15" r="1.4"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 20C5 10 11 4 20 4c0 9-6 15-15 16z"/><path d="M5 20c3-6 7-10 11-12"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M4 10h16M12 10v10M12 10s-1-5-4.5-5C5.5 5 5 8 7 9c1.5.8 5 1 5 1zM12 10s1-5 4.5-5C18.5 5 19 8 17 9c-1.5.8-5 1-5 1z"/></symbol>
+<symbol id="i-fire" viewBox="0 0 24 24"><path d="M12 21c-4 0-6.5-2.6-6.5-6 0-3 2.3-5 3.5-7.5 1 1 1.6 2 1.8 3.3C12.5 9 14 6 13.5 3c4 2.5 6 6.5 6 10 0 4.4-3.2 8-7.5 8z"/></symbol>
+<symbol id="i-cup" viewBox="0 0 24 24"><path d="M4 9h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M8 5v2M12 4v3"/></symbol>
+<symbol id="i-bath" viewBox="0 0 24 24"><circle cx="12" cy="14" r="7"/><path d="M7 12c1.6 1.2 3.3 1.2 5 0s3.4-1.2 5 0M8 4c0 1 1 1 1 2M12 3c0 1 1 1 1 2M16 4c0 1 1 1 1 2"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4M4 16h16M4 16v2M20 16v2"/><circle cx="8" cy="16" r="1.6"/><circle cx="16" cy="16" r="1.6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.4.9-4.6 4.4 1.1 6.3L12 17.2l-5.7 3 1.1-6.3L2.8 9.5l6.4-.9z"/></symbol>
+</defs></svg>
+
+<div class="stage">
+  <div class="addr"><svg class="i"><use href="#i-lockw"/></svg><span>misce.top/K7P2QX</span></div>
+
+  <div class="screen">
+    <div class="brand">
+      <b>Садиба «Гірська»</b>
+      <span class="expire"><svg class="i"><use href="#i-timer"/></svg>діє до 17.09.2026</span>
+    </div>
+
+    <div class="bk-photo">
+      <!-- згенероване «фото» будиночка: вечір у Карпатах (демо-ілюстрація) -->
+      <svg viewBox="0 0 360 210" role="img" aria-label="Будиночок №2 увечері, Карпати (демо-ілюстрація)">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fbd9a8"/><stop offset=".45" stop-color="#f0b48c"/><stop offset="1" stop-color="#d69a78"/>
+          </linearGradient>
+          <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b58d76"/><stop offset="1" stop-color="#a87f68"/></linearGradient>
+          <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6f5a"/><stop offset="1" stop-color="#7a5f4c"/></linearGradient>
+          <linearGradient id="mead" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c6b4e"/><stop offset="1" stop-color="#33503a"/></linearGradient>
+          <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a34"/><stop offset="1" stop-color="#6d4426"/></linearGradient>
+        </defs>
+        <rect width="360" height="210" fill="url(#sky)"/>
+        <circle cx="288" cy="52" r="17" fill="#fde8b8"/><circle cx="288" cy="52" r="26" fill="#fde8b8" opacity=".28"/>
+        <path d="M0 96 L58 52 104 88 150 44 208 92 262 56 314 92 360 62 V210 H0 Z" fill="url(#m1)"/>
+        <path d="M58 52 l10 10 -6 2 8 8 M150 44 l9 9 -6 2 8 8" stroke="#f4ead8" stroke-width="4" fill="none" opacity=".7"/>
+        <path d="M0 128 L70 92 140 126 216 86 292 124 360 96 V210 H0 Z" fill="url(#m2)"/>
+        <path d="M0 158 L90 122 180 156 265 118 360 150 V210 H0 Z" fill="url(#mead)"/>
+        <!-- смереки -->
+        <g fill="#243d2c">
+          <path d="M38 168 l12 -26 12 26 z M42 154 l8 -18 8 18 z"/><path d="M74 176 l10 -22 10 22 z M78 164 l6 -14 6 14 z"/>
+          <path d="M296 170 l12 -26 12 26 z M300 156 l8 -18 8 18 z"/><path d="M330 178 l10 -22 10 22 z M334 166 l6 -14 6 14 z"/>
+        </g>
+        <!-- будиночок -->
+        <g>
+          <path d="M118 138 L180 96 242 138 Z" fill="#4a3220"/>
+          <path d="M118 138 L180 96 242 138" fill="none" stroke="#e8d9c2" stroke-width="3"/>
+          <rect x="128" y="138" width="104" height="48" fill="url(#wood)"/>
+          <path d="M128 146h104M128 156h104M128 166h104M128 176h104" stroke="#5d3a1f" stroke-width="1.6" opacity=".7"/>
+          <rect x="141" y="150" width="24" height="36" rx="2" fill="#3a2412"/><rect x="144" y="153" width="18" height="20" fill="#f7c96b"/>
+          <rect x="182" y="150" width="26" height="20" rx="2" fill="#f7c96b" stroke="#3a2412" stroke-width="2.5"/>
+          <path d="M195 150v20M182 160h26" stroke="#3a2412" stroke-width="1.6"/>
+          <rect x="214" y="150" width="12" height="20" rx="2" fill="#f2b95a" stroke="#3a2412" stroke-width="2"/>
+          <rect x="199" y="102" width="10" height="20" fill="#5a4030"/>
+          <path d="M204 100c3-6 0-8 3-13" stroke="#e8e2da" stroke-width="4" fill="none" opacity=".75" stroke-linecap="round"/>
+          <path d="M120 186h124" stroke="#2a3f30" stroke-width="4" stroke-linecap="round"/>
+          <path d="M124 186c4-8 4-14 2-20M236 186c-4-8-4-14-2-20" stroke="#7d5a37" stroke-width="3" fill="none"/>
+        </g>
+        <!-- стежка та ліхтар -->
+        <path d="M176 186 C168 196 150 200 128 210 L212 210 C196 198 186 194 184 186 Z" fill="#8f9a7a" opacity=".85"/>
+        <line x1="258" y1="150" x2="258" y2="184" stroke="#3a2e1c" stroke-width="3"/><circle cx="258" cy="146" r="5" fill="#f7c96b"/><circle cx="258" cy="146" r="9" fill="#f7c96b" opacity=".3"/>
+        <text x="180" y="204" font-family="system-ui" font-size="8.5" fill="#dfe7d8" text-anchor="middle" opacity=".9">ілюстрація за мотивами фото будиночка · демо</text>
+      </svg>
+      <div class="bk-cap">
+        <h1>Будиночок №2 «З видом на гори»</h1>
+        <div class="where"><svg class="i"><use href="#i-pin"/></svg> Карпати, с. Микуличин · бронь <span class="mono">№ B-0512</span> · <svg class="i"><use href="#i-check"/></svg> підтверджено</div>
+      </div>
+    </div>
+
+    <div class="phrase">
+      <div class="leaf"><svg class="i"><use href="#i-leaf"/></svg></div>
+      <h2>Ваш час відпочинку настав</h2>
+      <p>Оксано та Андрію, будиночок уже пахне смерекою, а гори чекають саме на вас. До зустрічі в п’ятницю!</p>
+    </div>
+
+    <div class="card">
+      <div class="dates">
+        <div class="date-cell"><div class="lbl">Заїзд</div><div class="d">Пт, 12.09</div><div class="t">після 14:00</div></div>
+        <div class="nights">2 ночі</div>
+        <div class="date-cell" style="text-align:right"><div class="lbl">Виїзд</div><div class="d">Нд, 14.09</div><div class="t">до 12:00</div></div>
+      </div>
+      <div class="stay">
+        <div class="day edge"><span class="dow">Пт</span><span class="num">12</span><span class="tag">заїзд</span></div>
+        <div class="night"><svg class="i"><use href="#i-moon"/></svg><b>ніч 1</b></div>
+        <div class="day"><span class="dow">Сб</span><span class="num">13</span><span class="tag">у горах</span></div>
+        <div class="night"><svg class="i"><use href="#i-moon"/></svg><b>ніч 2</b></div>
+        <div class="day edge"><span class="dow">Нд</span><span class="num">14</span><span class="tag">виїзд</span></div>
+      </div>
+      <div class="stay-sum">3 дні відпочинку · 2 ночі в горах</div>
+      <div class="rowline" style="margin-top:8px"><span class="mut"><svg class="i"><use href="#i-users"/></svg> Гості</span><b>2 дорослих · 2 дітей</b></div>
+      <div class="rowline"><span class="mut">Вартість</span><b>5 600 грн</b></div>
+      <div class="rowline"><span class="mut">Передоплата</span><span style="display:flex;gap:8px;align-items:center"><b>1 500 грн</b><span class="bdg ok"><svg class="i"><use href="#i-check"/></svg>сплачено</span></span></div>
+      <div class="rowline"><span class="mut">Решта при заселенні</span><b>4 100 грн</b></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-leaf"/></svg>Як виглядає ваше житло</div>
+      <div class="gal">
+        <figure>
+          <svg viewBox="0 0 138 96" role="img" aria-label="Спальня (демо)">
+            <rect width="138" height="96" fill="#efe4d2"/><rect y="66" width="138" height="30" fill="#c9a97e"/>
+            <rect x="14" y="14" width="40" height="34" rx="2" fill="#e8d3ae"/><path d="M34 14v34M14 31h40" stroke="#8a6a48" stroke-width="3"/>
+            <rect x="66" y="42" width="58" height="26" rx="3" fill="#8a5a34"/><rect x="70" y="30" width="50" height="16" rx="4" fill="#f4ead8"/>
+            <rect x="72" y="34" width="20" height="9" rx="3" fill="#d9b98c"/><rect x="96" y="34" width="20" height="9" rx="3" fill="#d9b98c"/>
+            <rect x="66" y="68" width="58" height="6" fill="#6d4426"/>
+          </svg>
+          <figcaption>Спальня</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 138 96" role="img" aria-label="Тераса з видом (демо)">
+            <rect width="138" height="96" fill="#f6d9ad"/>
+            <path d="M0 44 L36 22 66 42 100 18 138 40 V96 H0 Z" fill="#a8876e"/>
+            <rect y="62" width="138" height="34" fill="#8a5a34"/><path d="M0 62h138" stroke="#5d3a1f" stroke-width="3"/>
+            <path d="M10 62v-16M34 62v-16M58 62v-16M82 62v-16M106 62v-16M130 62v-16" stroke="#6d4426" stroke-width="4"/><path d="M4 48h132" stroke="#6d4426" stroke-width="4"/>
+            <rect x="46" y="70" width="20" height="14" rx="2" fill="#e0c9a2"/><rect x="76" y="70" width="20" height="14" rx="2" fill="#e0c9a2"/>
+          </svg>
+          <figcaption>Тераса з видом</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 138 96" role="img" aria-label="Камін (демо)">
+            <rect width="138" height="96" fill="#e5d6c0"/><rect y="78" width="138" height="18" fill="#b39264"/>
+            <rect x="42" y="16" width="54" height="62" rx="3" fill="#9a8a78"/><rect x="52" y="40" width="34" height="30" rx="3" fill="#3a2c20"/>
+            <path d="M69 66c-7 0-11-5-11-10 0-5 4-8 5-12 2 2 3 4 3 6 1-4 4-8 3-13 6 4 10 9 10 15 0 8-5 14-10 14z" fill="#f0a04a"/>
+            <rect x="38" y="12" width="62" height="8" rx="2" fill="#7a5a38"/>
+            <rect x="14" y="60" width="18" height="18" fill="#8a6a48"/><path d="M14 66h18M14 72h18" stroke="#6d4426" stroke-width="2"/>
+          </svg>
+          <figcaption>Камін</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 138 96" role="img" aria-label="Кухня (демо)">
+            <rect width="138" height="96" fill="#efe8da"/><rect y="70" width="138" height="26" fill="#c9a97e"/>
+            <rect x="12" y="46" width="114" height="24" fill="#8a5a34"/><path d="M40 46v24M68 46v24M96 46v24" stroke="#6d4426" stroke-width="2.4"/>
+            <rect x="12" y="42" width="114" height="6" fill="#e0d3bd"/>
+            <rect x="18" y="14" width="46" height="18" rx="2" fill="#8a5a34"/><rect x="74" y="14" width="46" height="18" rx="2" fill="#8a5a34"/>
+            <path d="M78 42c0-7 4-10 9-10s9 3 9 10" fill="none" stroke="#5f5548" stroke-width="3"/>
+            <circle cx="34" cy="45" r="2.6" fill="#4c4438"/><circle cx="46" cy="45" r="2.6" fill="#4c4438"/>
+          </svg>
+          <figcaption>Кухня</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 138 96" role="img" aria-label="Вид з вікна (демо)">
+            <rect width="138" height="96" fill="#8a6a48"/>
+            <rect x="12" y="10" width="114" height="76" rx="3" fill="#fbd9a8"/>
+            <path d="M12 56 L48 30 76 52 104 26 126 44 V86 H12 Z" fill="#9a7c64"/>
+            <path d="M12 70 L58 50 100 68 126 58 V86 H12 Z" fill="#4c6b4e"/>
+            <circle cx="104" cy="24" r="8" fill="#fde8b8"/>
+            <path d="M69 10v76M12 48h114" stroke="#6d4426" stroke-width="5"/>
+          </svg>
+          <figcaption>Вид з вікна</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-fire"/></svg>Додаткові послуги</div>
+      <div class="srv"><span class="ic"><svg class="i"><use href="#i-bath"/></svg></span><span class="nm">Чан з гірськими травами<span class="mut">2 год увечері · до 6 осіб</span></span><b style="font-size:13px">1 200 грн</b><button class="addbtn">+ Додати</button></div>
+      <div class="srv"><span class="ic"><svg class="i"><use href="#i-cup"/></svg></span><span class="nm">Сніданок на терасі<span class="mut">о 9:00 · страви з печі</span></span><b style="font-size:13px">250 грн/ос.</b><button class="addbtn">+ Додати</button></div>
+      <div class="srv"><span class="ic"><svg class="i"><use href="#i-fire"/></svg></span><span class="nm">Лазня на дровах<span class="mut">3 год · віники в подарунок</span></span><b style="font-size:13px">800 грн</b><button class="addbtn">+ Додати</button></div>
+      <div class="srv"><span class="ic"><svg class="i"><use href="#i-car"/></svg></span><span class="nm">Трансфер із Яремче<span class="mut">зустрінемо з поїзда</span></span><b style="font-size:13px">300 грн</b><button class="addbtn">+ Додати</button></div>
+      <div class="mut" style="margin-top:8px;line-height:1.5">Обрані послуги побачить Оксана й підтвердить у Viber. Оплата — на місці.</div>
+    </div>
+
+    <div class="gift">
+      <span class="ic"><svg class="i"><use href="#i-gift"/></svg></span>
+      <div>
+        <h3>Презент від власника</h3>
+        <p>Банка карпатського меду та глінтвейн на терасі — наш подарунок для вас. Просто скажіть Оксані кодове слово <span class="word">смерека</span>.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-route"/></svg>Як доїхати</div>
+      <svg class="svgph" viewBox="0 0 360 140" role="img" aria-label="Схема проїзду до садиби">
+        <rect width="360" height="140" fill="#e7efe7"/>
+        <path d="M0 96 C80 96 110 40 200 40 C260 40 280 20 360 20" fill="none" stroke="#faf7ee" stroke-width="16"/>
+        <path d="M0 96 C80 96 110 40 200 40 C260 40 280 20 360 20" fill="none" stroke="#d6cdb6" stroke-width="1"/>
+        <text x="12" y="116" font-family="system-ui" font-size="9" fill="#5a6b5a">траса Н-09 · з Яремче</text>
+        <path d="M196 44 Q214 66 204 84 Q196 100 224 112" fill="none" stroke="#3E6B4E" stroke-width="3" stroke-dasharray="6 5" stroke-linecap="round"/>
+        <rect x="224" y="104" width="76" height="26" rx="3" fill="#cfe0d2"/>
+        <text x="262" y="121" font-family="system-ui" font-size="9.5" font-weight="700" fill="#2C5039" text-anchor="middle">Садиба · №2</text>
+        <path d="M186 30 l10 16 h-20 z" fill="#3f7a52"/><path d="M206 26 l9 14 h-18 z" fill="#568c66"/>
+        <circle cx="196" cy="42" r="7" fill="#B5432B"/><text x="196" y="45.5" font-family="system-ui" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">!</text>
+        <text x="150" y="24" font-family="system-ui" font-size="9" fill="#5a6b5a">поворот за вказівником «Садиба Гірська»</text>
+      </svg>
+      <ol class="steps">
+        <li><span class="stepnum">1</span>З траси Н-09 — поворот за коричневим вказівником «Садиба Гірська».</li>
+        <li><span class="stepnum">2</span>1,2 км ґрунтової дороги — проїзна для будь-якого авто.</li>
+        <li><span class="stepnum">3</span>Парковка біля reception. Підійдіть — вас зустріне адміністратор.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><svg class="i"><use href="#i-phone"/></svg>Контакти</div>
+      <div class="rowline"><span><b>Оксана</b><br><span class="mut">адміністраторка · reception 8:00–22:00</span></span><a class="bdg soft mono" href="tel:+380500000008">+38 050 000 00 08</a></div>
+      <div class="rowline"><span class="mut">Скажіть на reception</span><b>«Бронь B-0512, будиночок №2»</b></div>
+    </div>
+
+    <div class="private">
+      <div class="card-h"><svg class="i"><use href="#i-lock"/></svg>Для гостей · лише за цим посиланням</div>
+      <p><svg class="i"><use href="#i-wifi"/></svg> Wi-Fi: <b class="mono">Hory_2</b> · пароль <b class="mono">vesna2026</b></p>
+      <p style="margin-bottom:0"><svg class="i"><use href="#i-key"/></svg> Пізній заїзд після 22:00: ключ у скриньці біля дверей, код <b class="mono">15-07</b>. Попередьте Оксану заздалегідь.</p>
+    </div>
+
+    <div class="btnrow">
+      <a class="btn pri" href="https://maps.google.com/?q=48.404,24.579" target="_blank" rel="noopener"><svg class="i"><use href="#i-route"/></svg>Маршрут</a>
+      <a class="btn" href="tel:+380500000008"><svg class="i"><use href="#i-phone"/></svg>Подзвонити</a>
+    </div>
+
+    <div class="card rev-card" id="rev-card">
+      <div class="card-h"><svg class="i"><use href="#i-star"/></svg>Ваші враження</div>
+      <div class="rev-live">
+        <p class="rev-txt">Як вам відпочилось у будиночку №2? Оцініть і поділіться враженнями — це допоможе іншим гостям.</p>
+        <div class="stars" id="stars">
+          <button class="star" aria-label="1 зірка"><svg class="istar"><use href="#i-star"/></svg></button>
+          <button class="star" aria-label="2 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+          <button class="star" aria-label="3 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+          <button class="star" aria-label="4 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+          <button class="star" aria-label="5 зірок"><svg class="istar"><use href="#i-star"/></svg></button>
+        </div>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn" id="btn-review"><svg class="i"><use href="#i-star"/></svg>Залишити відгук</button>
+        </div>
+      </div>
+      <div class="rev-done">
+        <span class="bigstar"><svg class="istar" style="margin:0 auto"><use href="#i-star"/></svg></span>
+        <p><b>Дякуємо за відгук!</b><br>Оксана прочитає його вже сьогодні,<br>а оцінка з’явиться на сторінці садиби.</p>
+      </div>
+    </div>
+
+    <div class="pagefoot">Персональна сторінка бронювання · створено через misce.top OneLink<br>самознищиться 17.09.2026</div>
+  </div>
+
+  <div class="tip">Демо-дані (вигадані). Мокап картки бронювання, моб. версія, світла тема. «+ Додати» біля послуг — клікабельно.</div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll(".addbtn").forEach(function(b){
+    b.addEventListener("click",function(){
+      var on=b.classList.toggle("on");
+      b.textContent=on?"Додано ✓":"+ Додати";
+    });
+  });
+  var rating=0,stars=[].slice.call(document.querySelectorAll("#stars .star"));
+  stars.forEach(function(s,i){
+    s.addEventListener("click",function(){
+      rating=i+1;
+      stars.forEach(function(x,j){x.classList.toggle("on",j<rating)});
+    });
+  });
+  document.getElementById("btn-review").addEventListener("click",function(){
+    if(!rating){stars[4].focus();return;}
+    document.getElementById("rev-card").classList.add("done");
+  });
+})();
+</script>
+</body>
+</html>
