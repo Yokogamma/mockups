@@ -59,6 +59,36 @@ a{color:inherit;text-decoration:none}
 .private p{margin:6px 0;font-size:13px;line-height:1.55}
 .code-chip{display:inline-flex;gap:5px;margin-top:2px}
 .code-chip b{font-family:var(--mono);font-size:16px;background:var(--surface);color:var(--ink);border-radius:7px;padding:4px 9px;border:.5px solid var(--line-2)}
+/* відео-блок */
+.vid{position:relative;border-radius:var(--r-md);overflow:hidden;border:.5px solid var(--line);cursor:pointer}
+.vid svg{display:block;width:100%}
+.vplay{position:absolute;inset:0;margin:auto;width:54px;height:54px;border-radius:50%;border:0;background:rgba(20,14,6,.55);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(2px)}
+.vplay .i{margin-left:3px}
+.vbar{position:absolute;left:10px;right:52px;bottom:10px;height:4px;border-radius:99px;background:rgba(255,255,255,.35)}
+.vfill{width:0;height:100%;border-radius:99px;background:#fff}
+.vid.playing .vplay{display:none}
+.vid.playing .vfill{width:100%;transition:width 7s linear}
+.vtime{position:absolute;right:10px;bottom:5px;font-family:var(--mono);font-size:10.5px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.vnote{margin-top:8px}
+
+/* контакти-месенджери */
+.msngr .i.vib{color:#7360F2}
+.msngr .i.tg{color:#229ED9}
+.numlist{margin-top:9px;text-align:center;font-size:12px;color:var(--ink-2);line-height:1.7}
+.numlist a{font-family:var(--mono);font-weight:600;color:var(--ink);white-space:nowrap}
+
+/* відгук */
+.stars{display:flex;gap:8px;justify-content:center;margin:6px 0 10px}
+.star{background:none;border:0;padding:2px;cursor:pointer;color:var(--line-2);font-size:27px;line-height:1}
+.star.on{color:#DFA018}
+.istar{width:1em;height:1em;fill:currentColor;stroke:none;display:block}
+.rev-txt{text-align:center;font-size:13px;color:var(--ink-2);line-height:1.55;margin:0 0 4px}
+.rev-done{display:none;text-align:center;padding:6px 0 2px}
+.rev-done .bigstar{color:#DFA018;font-size:30px}
+.rev-done p{margin:6px 0 0;font-size:13px;color:var(--ink-2);line-height:1.5}
+.rev-card.done .rev-live{display:none}
+.rev-card.done .rev-done{display:block}
+
 .dead{display:none;text-align:center;padding:44px 16px}
 .dead .ring{width:58px;height:58px;margin:0 auto 12px;border-radius:50%;background:var(--surface-3);color:var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:28px}
 .dead h2{margin:0;font-size:17px;font-weight:800}
@@ -82,6 +112,12 @@ a{color:inherit;text-decoration:none}
 <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></symbol>
 <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M4 4l16 16M10 5.3A9.6 9.6 0 0 1 12 5c5 0 9 4.5 9.5 7-.2.9-1 2.3-2.3 3.6M6.6 6.7C4.5 8 3 10 2.5 12 3 14.5 7 19 12 19c1.4 0 2.7-.3 3.9-.9"/></symbol>
 <symbol id="i-lockw" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 1 1 8 0V10"/><circle cx="12" cy="15" r="1.4"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5l13 7.5-13 7.5z"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 10.5l5-3v9l-5-3"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-3-8-8-3z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.4.9-4.6 4.4 1.1 6.3L12 17.2l-5.7 3 1.1-6.3L2.8 9.5l6.4-.9z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M5.5 20c.7-3.6 3.2-5.6 6.5-5.6s5.8 2 6.5 5.6"/></symbol>
 </defs></svg>
 
 <div class="stage">
@@ -133,6 +169,7 @@ a{color:inherit;text-decoration:none}
           <rect x="0" y="62" width="360" height="26" fill="#faf7ee"/><rect x="150" y="0" width="24" height="150" fill="#faf7ee"/>
           <text x="8" y="58" font-family="system-ui" font-size="9" fill="#8a7f66">вул. Здолбунівська</text>
           <rect x="24" y="16" width="80" height="34" rx="3" fill="#ded2ba"/><rect x="210" y="14" width="120" height="36" rx="3" fill="#ded2ba"/>
+          <text x="270" y="36" font-family="system-ui" font-size="9" font-weight="600" fill="#8a7f66" text-anchor="middle">ТЦ «Аполло»</text>
           <rect x="196" y="100" width="130" height="40" rx="3" fill="#EBD6BB"/>
           <text x="261" y="123" font-family="system-ui" font-size="10" font-weight="700" fill="#7A431C" text-anchor="middle">Цех · 7Д</text>
           <circle cx="46" cy="118" r="12" fill="#D4453C"/><text x="46" y="122" font-family="system-ui" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">М</text>
@@ -142,31 +179,91 @@ a{color:inherit;text-decoration:none}
           <text x="272" y="92" font-family="system-ui" font-size="9" fill="#7A431C">вхід</text>
         </svg>
         <ol class="steps">
-          <li><span class="stepnum">1</span>Від метро «Осокорки» — 8 хв пішки вздовж Здолбунівської.</li>
-          <li><span class="stepnum">2</span>За синьою брамою будинку 7Д поверніть праворуч.</li>
-          <li><span class="stepnum">3</span>Вхід «Видача» — двері з мідною табличкою misce.top.</li>
+          <li><span class="stepnum">1</span>Від м. «Осокорки» — маршрутка №87 до зупинки «Осокір» (або 12 хв пішки).</li>
+          <li><span class="stepnum">2</span>150 м вздовж Дніпровської набережної, поворот на Здолбунівську — ще 100 м.</li>
+          <li><span class="stepnum">3</span>Праворуч ТЦ «Аполло», вхід «Видача» — у дворі 7Д, за ворітьми.</li>
         </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><svg class="i"><use href="#i-video"/></svg>Відео · як нас знайти</div>
+        <div class="vid" id="vid">
+          <svg viewBox="0 0 360 170" role="img" aria-label="Кадр відео проходу (демо)">
+            <rect width="360" height="170" fill="#d8ccb4"/>
+            <rect y="118" width="360" height="52" fill="#a8967a"/>
+            <path d="M148 118 L212 118 250 170 110 170 Z" fill="#c2b092"/>
+            <rect x="20" y="34" width="120" height="84" fill="#e9dfc8"/><rect x="20" y="34" width="120" height="12" fill="#B0622F"/>
+            <rect x="236" y="42" width="104" height="76" fill="#cabda1"/><rect x="246" y="52" width="84" height="40" fill="#e2d7bd"/>
+            <text x="288" y="76" font-family="system-ui" font-size="10" font-weight="600" fill="#8a7f66" text-anchor="middle">ТЦ «Аполло»</text>
+            <rect x="52" y="70" width="26" height="48" fill="#7a6a52"/>
+            <text x="80" y="28" font-family="system-ui" font-size="10.5" font-weight="700" fill="#7A431C" text-anchor="middle">ВИДАЧА · 7Д</text>
+            <path d="M180 160 L180 120 L120 96" fill="none" stroke="#B0622F" stroke-width="4" stroke-dasharray="7 6" stroke-linecap="round"/>
+            <path d="M120 96 l14 -1 -6 12 z" fill="#B0622F"/>
+            <text x="180" y="12" font-family="system-ui" font-size="8.5" fill="#8a7f66" text-anchor="middle">демо-кадр · тут буде ваше відео проходу</text>
+          </svg>
+          <button class="vplay" id="vplay" aria-label="Відтворити відео"><svg class="i"><use href="#i-play"/></svg></button>
+          <div class="vbar"><div class="vfill" id="vfill"></div></div>
+          <span class="vtime">0:48</span>
+        </div>
+        <div class="mut vnote">Коротке відео (30–60 сек): від зупинки до дверей видачі. У мокапі — тестова заглушка, натисніть ▶.</div>
       </div>
 
       <div class="private">
         <div class="card-h"><svg class="i"><use href="#i-lock"/></svg>Видача поза графіком · лише для вас</div>
-        <p>Ми залишили ваш пакунок за хвірткою <b>праворуч від входу, у сірій шафі №2</b>. Наберіть код на замку:</p>
-        <span class="code-chip"><b>4</b><b>2</b><b>7</b></span>
-        <svg class="svgph" style="margin-top:10px" viewBox="0 0 360 110" role="img" aria-label="Фото місця, де залишено пакунок (демо)">
-          <rect width="360" height="110" fill="#d8d2c2"/><rect y="80" width="360" height="30" fill="#b3ab97"/>
-          <rect x="40" y="18" width="90" height="66" fill="#8b93a0"/><rect x="47" y="25" width="76" height="24" fill="#a5adba"/><rect x="47" y="53" width="76" height="24" fill="#a5adba"/>
-          <circle cx="115" cy="65" r="4" fill="#3f4650"/>
-          <path d="M150 84 L210 84 210 20 150 20 Z" fill="#c8bfa8"/><path d="M162 84V20M174 84V20M186 84V20M198 84V20" stroke="#a99f86" stroke-width="3"/>
-          <text x="85" y="100" font-family="system-ui" font-size="9" fill="#6b6350" text-anchor="middle">шафа №2 · демо-фото</text>
-          <circle cx="85" cy="40" r="14" fill="none" stroke="#B5432B" stroke-width="3"/>
+        <p>Ваше замовлення залишили <b>на прохідній у охорони</b> (працює цілодобово).</p>
+        <p><svg class="i"><use href="#i-user"/></svg> Охоронець <b>Андрій</b> · <a href="tel:+380670000007" class="mono" style="font-weight:700;text-decoration:underline">067 000-00-07</a> — назвіть номер замовлення <b class="mono">№ 1247</b>, і він видасть пакунок.</p>
+        <svg class="svgph" style="margin-top:6px" viewBox="0 0 360 120" role="img" aria-label="Прохідна біля воріт 7Д (демо)">
+          <rect width="360" height="120" fill="#ddd3bd"/><rect y="88" width="360" height="32" fill="#b3a68c"/>
+          <rect x="36" y="26" width="96" height="62" fill="#c2b092"/>
+          <rect x="48" y="38" width="42" height="28" fill="#efe6cf"/><path d="M48 52h42" stroke="#a8977a" stroke-width="2"/>
+          <circle cx="69" cy="60" r="7" fill="#8a7a62"/><path d="M62 66c2-4 12-4 14 0" stroke="#8a7a62" stroke-width="3" fill="none"/>
+          <rect x="100" y="42" width="24" height="46" fill="#8a7a62"/>
+          <text x="84" y="20" font-family="system-ui" font-size="10" font-weight="700" fill="#7A431C" text-anchor="middle">ПРОХІДНА</text>
+          <rect x="132" y="62" width="8" height="26" fill="#6b6350"/>
+          <path d="M140 66 L268 58" stroke="#B5432B" stroke-width="6" stroke-linecap="round"/><path d="M150 65.4l10-.6M180 63.6l10-.6M210 61.7l10-.6M240 59.8l10-.6" stroke="#f4ead8" stroke-width="6"/>
+          <rect x="286" y="30" width="52" height="58" fill="#9a8a6e"/><path d="M292 36h40M292 46h40M292 56h40M292 66h40M292 76h40" stroke="#7d6f54" stroke-width="3"/>
+          <text x="312" y="104" font-family="system-ui" font-size="9" fill="#6b6350" text-anchor="middle">ворота 7Д</text>
+          <text x="180" y="114" font-family="system-ui" font-size="9" fill="#6b6350" text-anchor="middle">прохідна · демо-фото</text>
         </svg>
+        <p><b>Як пройти на прохідну:</b> хвіртка ліворуч від воріт 7Д → одразу за нею вікно охорони. Подзвоніть у дзвінок, якщо вікно зачинене.</p>
         <p style="margin-bottom:0"><svg class="i"><use href="#i-eyeoff"/></svg> Цю інформацію видно лише за вашим особистим посиланням. Нікому його не пересилайте.</p>
       </div>
 
-      <div class="btnrow">
-        <a class="btn pri" href="https://maps.google.com/?q=50.397,30.635" target="_blank" rel="noopener"><svg class="i"><use href="#i-route"/></svg>Маршрут</a>
-        <a class="btn" href="tel:+380500000009"><svg class="i"><use href="#i-phone"/></svg>Подзвонити</a>
+      <div class="card msngr">
+        <div class="card-h"><svg class="i"><use href="#i-phone"/></svg>Звʼязатися з нами</div>
+        <div class="btnrow" style="margin-top:0">
+          <a class="btn pri" href="tel:+380500887472"><svg class="i"><use href="#i-phone"/></svg>Подзвонити</a>
+          <a class="btn" href="viber://chat?number=%2B380500887472"><svg class="i vib"><use href="#i-chat"/></svg>Viber</a>
+          <a class="btn" href="https://t.me/+380500887472" target="_blank" rel="noopener"><svg class="i tg"><use href="#i-send"/></svg>Telegram</a>
+        </div>
+        <div class="numlist"><a href="tel:+380500887472">050 088-74-72</a> · <a href="tel:+380680151548">068 015-15-48</a> · <a href="tel:+380443371580">044 337-15-80</a></div>
       </div>
+
+      <div class="btnrow">
+        <a class="btn pri" href="https://maps.google.com/?q=50.397,30.635" target="_blank" rel="noopener"><svg class="i"><use href="#i-route"/></svg>Прокласти маршрут</a>
+      </div>
+
+      <div class="card rev-card" id="rev-card">
+        <div class="card-h"><svg class="i"><use href="#i-star"/></svg>Ваші враження</div>
+        <div class="rev-live">
+          <p class="rev-txt">Оцініть, як пройшло отримання замовлення — це допоможе нам стати кращими.</p>
+          <div class="stars" id="stars">
+            <button class="star" aria-label="1 зірка"><svg class="istar"><use href="#i-star"/></svg></button>
+            <button class="star" aria-label="2 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+            <button class="star" aria-label="3 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+            <button class="star" aria-label="4 зірки"><svg class="istar"><use href="#i-star"/></svg></button>
+            <button class="star" aria-label="5 зірок"><svg class="istar"><use href="#i-star"/></svg></button>
+          </div>
+          <div class="btnrow" style="margin-top:0">
+            <button class="btn" id="btn-review"><svg class="i"><use href="#i-star"/></svg>Залишити відгук</button>
+          </div>
+        </div>
+        <div class="rev-done">
+          <span class="bigstar"><svg class="istar" style="margin:0 auto"><use href="#i-star"/></svg></span>
+          <p><b>Дякуємо за відгук!</b><br>Ваша оцінка допомагає іншим клієнтам.</p>
+        </div>
+      </div>
+
       <div class="btnrow" style="margin-top:8px">
         <button class="btn ghost" id="btn-picked"><svg class="i"><use href="#i-check"/></svg>Я забрав(ла) замовлення — деактивувати сторінку</button>
       </div>
@@ -192,6 +289,26 @@ a{color:inherit;text-decoration:none}
   });
   document.getElementById("btn-undo").addEventListener("click",function(){
     document.getElementById("scr").classList.remove("used");
+  });
+  var vid=document.getElementById("vid"),vfill=document.getElementById("vfill");
+  vid.addEventListener("click",function(){
+    if(vid.classList.contains("playing"))return;
+    vid.classList.add("playing");
+  });
+  vfill.addEventListener("transitionend",function(){
+    vid.classList.remove("playing");
+    vfill.style.transition="none";vfill.offsetWidth;vfill.style.transition="";
+  });
+  var rating=0,stars=[].slice.call(document.querySelectorAll("#stars .star"));
+  stars.forEach(function(s,i){
+    s.addEventListener("click",function(){
+      rating=i+1;
+      stars.forEach(function(x,j){x.classList.toggle("on",j<rating)});
+    });
+  });
+  document.getElementById("btn-review").addEventListener("click",function(){
+    if(!rating){stars[4].focus();return;}
+    document.getElementById("rev-card").classList.add("done");
   });
 })();
 </script>
