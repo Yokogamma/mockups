@@ -7,7 +7,7 @@
 Нотатки на чистому аркуші: кілька нотаток, панель зі списком, пошук по назві й повнотекстовий, автозбереження. Дані лежать лише в localStorage цього пристрою (поки без синхронізації). Тема, сітка і правопис — спільні для всіх нотаток. Встановлюється як застосунок (manifest + service worker), працює без мережі.
 
 - `sheet/index.html` — застосунок; `manifest.webmanifest`, `sw.js`, іконки.
-- Публікація: `.github/workflows/pages.yml` викладає лише папку `sheet/` на GitHub Pages при пуші в `main` (або вручну через «Run workflow»). Один раз у репозиторії: Settings → Pages → Build and deployment → Source: **GitHub Actions**. Адреса: `https://yokogamma.github.io/mockups/`.
+- Публікація: `.github/workflows/pages.yml` викладає лише папку `sheet/` на GitHub Pages при пуші в `main` (або вручну через «Run workflow»). Pages вмикається автоматично при першому запуску workflow. Адреса: `https://yokogamma.github.io/mockups/`.
 - Локально: `python3 -m http.server 8765 --directory sheet` і відкрити `http://localhost:8765/` (service worker працює лише по http(s), не з file://).
 - Старий одноаркушевий мокап `freeform-editor-mockup.html` лишається як демо; його аркуш із localStorage автоматично стає першою нотаткою застосунку.
 

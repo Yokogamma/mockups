@@ -1,5 +1,5 @@
 # Публікує лише папку sheet/ (застосунок «Чистий аркуш») на GitHub Pages.
-# Один раз у налаштуваннях репозиторію: Settings → Pages → Build and deployment → Source: GitHub Actions.
+# Pages вмикається автоматично при першому запуску (enablement: true); вручну нічого вмикати не треба.
 name: Deploy sheet to GitHub Pages
 on:
   push:
@@ -22,6 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true   # сам вмикає Pages (Source: GitHub Actions) при першому запуску
       - uses: actions/upload-pages-artifact@v3
         with:
           path: sheet
