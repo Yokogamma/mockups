@@ -1,14 +1,11 @@
 # mockups
 
-Клікабельні UI-мокапи (окремі HTML-файли в корені) і застосунок «Чистий аркуш» у `sheet/` (один файл `sheet/index.html`, vanilla JS, PWA, без збірки; `sw.js`, `manifest.webmanifest`, іконки).
+Clickable UI mockups, one HTML file each in the repository root, published by GitHub Pages from `main` at https://yokogamma.github.io/mockups/.
 
-## Домовленості
+The notes app «Чистий аркуш» that used to live in `sheet/` moved on 2026-10-08 to its own repository, [Yokogamma/baobook](https://github.com/Yokogamma/baobook), as Baobook (https://baobook.matamata.dev). Work on it happens there; see that repository's CLAUDE.md. `sheet/` here keeps only the closing page with a notes export and a self-removing service worker. Do not bring the app back.
 
-- Спілкування з власником — російською. Тексти інтерфейсу, коміти, README та документація в репозиторії — українською.
-- Публікація: GitHub Pages збирає весь репозиторій з гілки `main`, застосунок живе за адресою https://yokogamma.github.io/mockups/sheet/ (окремий workflow не потрібен). Робочий цикл: гілка → PR у `main` → merge → перевірити живу сторінку (`curl` з маркером нової версії, збірка триває ~1–2 хв).
-- Перед комітом прогнати тести з `sheet/tests/` (Playwright, див. `sheet/tests/README.md`); ті самі сценарії ганяє GitHub Actions (`.github/workflows/tests.yml`) на PR і при пуші в `main`. Кожна нова функція отримує свій сценарій там само.
-- Дані користувача: нотатки в IndexedDB (`sheet` / `notes`), налаштування в localStorage (`sheet:settings`); детально в `sheet/SYNC-PLAN.md`.
+## Conventions
 
-## Поточний стан і наступний крок
-
-План доробок мобільної версії (статуси збереження, клавіатура й нижні панелі, видимі дії блока, зони дотику, стек скасування, доступність, маршрут нотатки, перенос за шапку, модуль жестів) з контрактами поведінки та критеріями приймання — у `sheet/MOBILE-PLAN.md` (редакція 2 після ревʼю); саме ревʼю — у `sheet/MOBILE-REVIEW.md`. Порядок PR: A (збереження і ввід) → B (дії блока, відновлення, доступність) → C (жести, рефакторинг); перед початком кожного PR звірятися з розділами 3–5 плану. Зроблено: PR A і PR B повністю (дії блока, зони дотику, шапка області, стек скасування, маршрут Back і базова доступність); PR C теж зроблено повністю: перенос за шапку, шапка блока коду в один рядок, альтернативи перетягуванню і пресети висоти, модуль жестів `gesture`, `cardBar` і один блок стилів для дотику. Мобільний план закрито. Версії нотаток: PR 1 (сховище, правила R1–R3, прорідження, бюджет, GC, `sheetDebug.vers`) зроблено за рішеннями розділу 8 за замовчуванням; далі PR 2 (кнопка і панель «Історія», показ версії на полотні, відкат нотатки) і PR 3 (відкат блока, іменовані версії, очищення історії, пошук, експорт з історією). План версій нотаток (тіла блоків за хешем вмісту, версія перед першою правкою і не частіше ніж раз на 5 хв, прорідження, панель «Історія» з відкатом нотатки чи блока) — у `sheet/VERSIONS-PLAN.md`, редакція 1 на ревʼю; три PR після погодження відкритих питань розділу 8. Огляд варіантів збереження й синхронізації, ухвалені рішення та план третього кроку (вхід через Google і синхронізація через Firebase) — у `sheet/SYNC-PLAN.md`. Перед початком робіт над синхронізацією прочитати його і отримати від власника конфігурацію Firebase та відповіді на відкриті питання.
+- Talk to the owner in Russian. Commits and PRs are in English.
+- Workflow: branch → PR into `main` → the owner merges → check the live page with `curl` (the Pages build takes 1–2 minutes).
+- Mockups use demo data only, no real clients.
