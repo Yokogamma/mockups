@@ -4,7 +4,7 @@
 
 ## sheet/ — «Чистий аркуш» moved to Baobook
 
-The notes app that lived here was renamed to **Baobook** and moved to its own repository, [Yokogamma/baobook](https://github.com/Yokogamma/baobook), with its full history. It runs at https://baobook.matamata.dev.
+The notes app that lived here was renamed to **Baobook** and moved to its own repository, [Yokogamma/baobook](https://github.com/Yokogamma/baobook), with its full history. It runs at https://baobook.matamata.app.
 
 `sheet/` now holds only a closing page and a service worker that removes itself:
 
