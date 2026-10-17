@@ -37,14 +37,15 @@ const status = document.getElementById('status'), button = document.getElementBy
 
 function readIndexedDB() {
   return new Promise(resolve => {
-    let created = false;
-    const req = indexedDB.open('sheet');
+    let created = false, req;
+    try { req = indexedDB.open('sheet'); } catch (_) { resolve([]); return; }   // storage disabled or blocked: still offer what localStorage holds
     req.onupgradeneeded = e => { created = true; e.target.transaction.abort(); };   // no database yet: do not create an empty one
     req.onerror = () => resolve([]);
     req.onsuccess = () => {
       const db = req.result;
       if (created || !db.objectStoreNames.contains('notes')) { db.close(); resolve([]); return; }
-      const all = db.transaction('notes', 'readonly').objectStore('notes').getAll();
+      let all;
+      try { all = db.transaction('notes', 'readonly').objectStore('notes').getAll(); } catch (_) { db.close(); resolve([]); return; }
       all.onsuccess = () => { db.close(); resolve(all.result); };
       all.onerror = () => { db.close(); resolve([]); };
     };
